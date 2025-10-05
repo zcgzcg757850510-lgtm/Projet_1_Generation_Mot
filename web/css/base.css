@@ -1,0 +1,101 @@
+/* CSS 变量定义 */
+:root { 
+  --bg-0: #0e0f12; 
+  --bg-1: #111317; 
+  --fg-0: #eaeaea; 
+  --muted: #a7a7a7; 
+  --glass: rgba(255,255,255,.07); 
+  --glass-2: rgba(255,255,255,.10); 
+  --border: rgba(255,255,255,.18); 
+}
+
+/* 基础重置样式 */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body { 
+  margin: 0; 
+  padding: 0;
+  color: var(--fg-0); 
+  background: radial-gradient(80rem 80rem at 20% -10%, #1a1c20, transparent 60%), 
+              radial-gradient(60rem 60rem at 120% 20%, #1a1b1f, transparent 50%), 
+              linear-gradient(135deg, var(--bg-0) 0%, var(--bg-1) 100%); 
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  overflow-x: hidden;
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
+  -webkit-overscroll-behavior: none !important;
+  -webkit-overscroll-behavior-y: none !important;
+  -ms-overscroll-behavior: none !important;
+  -webkit-overflow-scrolling: auto !important;
+  touch-action: pan-x pan-y !important;
+}
+
+/* 隐藏滚动条 */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* Firefox */
+html {
+  scrollbar-width: none;
+}
+
+/* IE and Edge */
+body {
+  -ms-overflow-style: none;
+}
+
+/* 基础布局 */
+.container {
+  max-width: 1440px;
+  margin: 16px auto;
+  padding: 0 16px;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel:not(.hidden) {
+  display: block;
+}
+
+.tab-panel.hidden {
+  display: none !important;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr 320px;
+  gap: 12px;
+}
+
+@media (max-width: 1100px) { 
+  .layout {
+    grid-template-columns: 1fr;
+  } 
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--glass); 
+  backdrop-filter: blur(12px) saturate(120%); 
+  -webkit-backdrop-filter: blur(12px) saturate(120%); 
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+.section {
+  padding: 12px;
+}

@@ -1,0 +1,160 @@
+<!-- Article Generation Modal -->
+<div id="articleModal" class="modal hidden">
+  <div class="box">
+    <div class="toolbar" style="background: var(--glass); backdrop-filter: blur(12px) saturate(120%); -webkit-backdrop-filter: blur(12px) saturate(120%); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;">
+      <div class="left" style="color: var(--fg-0); font-weight: 600;">文章生成设置</div>
+      <div class="right">
+        <button type="button" id="btnArticleClose" style="background: var(--glass); border: 1px solid var(--border); color: var(--fg-0); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">✖ 关闭</button>
+      </div>
+    </div>
+    <div class="viewport" style="background: var(--bg-1); padding: 24px; padding-bottom: 80px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; max-width: none; margin: 0;">
+        <!-- Left Column: Settings -->
+        <div class="settings-panel" style="background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 20px; backdrop-filter: blur(12px) saturate(120%); -webkit-backdrop-filter: blur(12px) saturate(120%);">
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label class="form-label" style="display: block; margin-bottom: 8px; color: var(--fg-0); font-weight: 500;">输入文本</label>
+            <textarea id="articleText" placeholder="请输入要生成的文章内容（建议50字以内）" 
+                      style="width: 100%; height: 120px; padding: 12px; border-radius: 12px; 
+                             border: 1px solid var(--border); background: rgba(255,255,255,.06); 
+                             color: var(--fg-0); resize: vertical; font-family: inherit; outline: none; transition: border-color 0.2s;">春江潮水连海平，海上明月共潮生。滟滟随波千万里，何处春江无月明！</textarea>
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label class="form-label" style="display: block; margin-bottom: 12px; color: var(--fg-0); font-weight: 500;">字体类型</label>
+            <div class="radio-group" style="display: flex; gap: 12px; margin-bottom: 16px;">
+              <label class="radio-option" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,.03);">
+                <input type="radio" name="fontType" value="D1" checked style="margin: 0;">
+                <span style="color: var(--fg-0); font-size: 14px;">D1字体 (网格变形)</span>
+              </label>
+              <label class="radio-option" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,.03);">
+                <input type="radio" name="fontType" value="D2" style="margin: 0;">
+                <span style="color: var(--fg-0); font-size: 14px;">D2字体 (中轴填充)</span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label class="form-label" style="display: block; margin-bottom: 12px; color: var(--fg-0); font-weight: 500;">背景选择</label>
+            <div class="radio-group" style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+              <label class="radio-option background-option" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,.03);">
+                <input type="radio" name="backgroundType" value="a4" checked style="margin: 0;">
+                <span style="color: var(--fg-0); font-size: 14px;">📄 A4纸背景</span>
+              </label>
+              <label class="radio-option background-option" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,.03);">
+                <input type="radio" name="backgroundType" value="lined" style="margin: 0;">
+                <span style="color: var(--fg-0); font-size: 14px;">📝 下划线纸</span>
+              </label>
+              <label class="radio-option background-option" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,.03);">
+                <input type="radio" name="backgroundType" value="custom" style="margin: 0;">
+                <span style="color: var(--fg-0); font-size: 14px;">🖼️ 自定义图片</span>
+              </label>
+            </div>
+            <input type="file" id="backgroundUpload" accept="image/*" 
+                   style="width: 100%; padding: 10px; border-radius: 8px; 
+                          border: 1px solid var(--border); background: rgba(255,255,255,.06); 
+                          color: var(--fg-0); display: none; font-family: inherit;">
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label class="form-label" style="display: block; margin-bottom: 12px; color: var(--fg-0); font-weight: 500;">间距设置</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="input-group">
+                <label style="display: block; margin-bottom: 6px; font-size: 12px; color: var(--muted);">行间距 (px)</label>
+                <input type="number" id="lineSpacing" value="16" min="0" max="100" 
+                       style="width: 100%; padding: 10px; border-radius: 8px; 
+                              border: 1px solid var(--border); background: rgba(255,255,255,.06); 
+                              color: var(--fg-0); outline: none; transition: border-color 0.2s;">
+              </div>
+              <div class="input-group">
+                <label style="display: block; margin-bottom: 6px; font-size: 12px; color: var(--muted);">字间距 (px)</label>
+                <input type="number" id="charSpacing" value="3" min="0" max="80" 
+                       style="width: 100%; padding: 10px; border-radius: 8px; 
+                              border: 1px solid var(--border); background: rgba(255,255,255,.06); 
+                              color: var(--fg-0); outline: none; transition: border-color 0.2s;">
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label class="form-label" style="display: block; margin-bottom: 12px; color: var(--fg-0); font-weight: 500;">字体大小</label>
+            <input type="range" id="fontSize" min="20" max="80" value="26" 
+                   style="width: 100%; margin-bottom: 8px; accent-color: #fff90a;">
+            <div style="text-align: center; font-size: 12px; color: var(--muted);">
+              <span id="fontSizeValue">26</span>px
+            </div>
+          </div>
+          
+          <div class="action-buttons" style="display: flex; gap: 12px; justify-content: center;">
+            <button type="button" id="btnGenerateArticle" 
+                    style="padding: 12px 24px; font-size: 14px; background: linear-gradient(135deg, #fff90a, #ffeb3b); 
+                           border: none; border-radius: 10px; color: #000; cursor: pointer; font-weight: 600;
+                           transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(255, 249, 10, 0.3);">
+              生成文章
+            </button>
+            <button type="button" id="btnResetInput" 
+                    style="padding: 12px 20px; font-size: 14px; background: var(--glass); 
+                           border: 1px solid var(--border); border-radius: 10px; color: var(--fg-0); cursor: pointer; 
+                           transition: all 0.2s ease;">
+              重新输入
+            </button>
+          </div>
+          
+          <!-- Progress Bar -->
+          <div id="progressContainer" style="margin-top: 20px; display: none;">
+            <div style="background: rgba(255,255,255,0.1); border-radius: 10px; height: 6px; overflow: hidden;">
+              <div id="progressBar" style="background: linear-gradient(90deg, #fff90a, #ffeb3b); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+            <div id="progressText" style="margin-top: 8px; font-size: 12px; color: var(--muted); text-align: center;">正在生成...</div>
+          </div>
+        </div>
+        
+        <!-- Right Column: Preview -->
+        <div class="preview-panel" style="background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 20px; backdrop-filter: blur(12px) saturate(120%); -webkit-backdrop-filter: blur(12px) saturate(120%);">
+          <div style="margin-bottom: 12px;">
+            <div style="color: var(--fg-0); font-weight: 600; font-size: 16px;">预览效果</div>
+          </div>
+          <div id="articlePreviewContainer" 
+               style="width: 100%; height: calc(100vh - 280px); min-height: 600px; max-height: 800px;
+                      border: 1px solid var(--border); border-radius: 12px; 
+                      background: #e8e8e8; overflow: auto;
+                      position: relative; display: flex; align-items: center; justify-content: center;
+                      padding: 20px;
+                      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.3) transparent;">
+            <div id="articlePreview" 
+                 style="width: 210mm; height: 297mm; 
+                        background: #fff; 
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                        position: relative; display: flex; align-items: center; justify-content: center;
+                        transform-origin: center center;
+                        transition: transform 0.3s ease;">
+              <div style="padding: 40px; color: #999; text-align: center; font-size: 14px;">
+                <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">📝</div>
+                <div>预览区域 (A4: 210mm × 297mm)</div>
+                <div style="font-size: 12px; margin-top: 8px;">请输入文本并点击生成</div>
+                <div style="font-size: 11px; margin-top: 4px; color: #bbb;">预览显示实际大小（自动缩放以适应窗口）</div>
+              </div>
+            </div>
+          </div>
+          <div id="scaleInfo" style="margin-top: 8px; text-align: center; font-size: 11px; color: var(--muted); display: none;">
+            <span>缩放: <span id="scaleValue">100</span>%</span>
+          </div>
+          <div style="margin-top: 16px; text-align: center; display: flex; gap: 12px; justify-content: center;">
+            <button type="button" id="btnDownloadArticle" 
+                    style="padding: 10px 20px; background: var(--glass); border: 1px solid var(--border); 
+                           border-radius: 8px; color: var(--fg-0); cursor: pointer; display: none; 
+                           transition: all 0.2s ease; font-size: 14px;">
+              📥 下载图片
+            </button>
+            <button type="button" id="btnDownloadPDF" 
+                    style="padding: 10px 20px; background: linear-gradient(135deg, #ff6b6b, #ee5a52); 
+                           border: none; border-radius: 8px; color: white; cursor: pointer; display: none; 
+                           transition: all 0.2s ease; font-size: 14px; font-weight: 500;
+                           box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);">
+              📄 下载PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

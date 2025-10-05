@@ -1,0 +1,294 @@
+/* 预览卡片样式 */
+.four {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+/* Styles pour les boutons d'agrandissement */
+.expand-btn {
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.expand-btn:hover {
+  background: var(--glass) !important;
+  color: var(--fg-0) !important;
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.expand-btn:active {
+  transform: scale(0.95);
+}
+
+/* État d'expansion des fenêtres */
+.window-expanded {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 1fr !important;
+}
+
+.window-expanded .preview-card {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+@media (max-width: 1100px) { 
+  .four {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  } 
+}
+
+.cell {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--glass);
+  padding: 8px;
+}
+
+.cell .t {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.cell img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  background: #fff;
+}
+
+/* 预览卡片基础样式 */
+.preview-cards {
+  display: block;
+  position: relative;
+}
+
+.cards__inner {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 12px;
+  min-height: 400px;
+}
+
+.preview-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--glass);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  padding: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  border-color: rgba(255,255,255,0.3);
+}
+
+/* 统一标题样式 */
+.preview-title {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+/* 兼容旧样式 */
+.preview-card .t {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+/* 预览内容容器 */
+.preview-content {
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+/* 统一图片样式 */
+.preview-image {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  transition: opacity 0.3s ease;
+}
+
+.preview-image:not([src]),
+.preview-image[src=""] {
+  display: none;
+}
+
+/* 兼容旧图片样式 */
+.preview-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  transition: opacity 0.3s ease;
+}
+
+.preview-card img:not([src]),
+.preview-card img[src=""] {
+  display: none;
+}
+
+/* 对比滑块样式 */
+.compare-wrapper {
+  position: relative;
+  width: 100%;
+  cursor: ew-resize;
+}
+
+.compare-base {
+  width: 100%;
+  height: auto;
+  display: none;
+}
+
+.compare-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: auto;
+  display: none;
+  clip-path: inset(0 0 0 0);
+}
+
+.compare-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #fff90a;
+  left: 50%;
+  display: none;
+  cursor: ew-resize;
+  visibility: hidden;
+  z-index: 10;
+}
+
+/* 变形指示器 */
+.transform-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 16px;
+  opacity: 0.7;
+  display: none;
+}
+
+.preview-card[data-card="D2"] .transform-indicator {
+  display: block;
+}
+
+/* Preview cards hover effect */
+.preview-card {
+  transition: 400ms background ease;
+  will-change: background;
+}
+
+.preview-card[data-card="A"] {
+  --hue: 210;
+  --saturation: 100%;
+  --lightness: 60%;
+}
+
+.preview-card[data-card="B"] {
+  --hue: 120;
+  --saturation: 100%;
+  --lightness: 50%;
+}
+
+.preview-card[data-card="C"] {
+  --hue: 45;
+  --saturation: 100%;
+  --lightness: 55%;
+}
+
+.preview-card[data-card="D1"] {
+  --hue: 0;
+  --saturation: 100%;
+  --lightness: 60%;
+}
+
+.preview-card[data-card="D2"] {
+  --hue: 270;
+  --saturation: 100%;
+  --lightness: 65%;
+}
+
+.preview-card:hover {
+  background: hsla(var(--hue), var(--saturation), var(--lightness), 0.1);
+  border-color: hsla(var(--hue), var(--saturation), var(--lightness), 0.3);
+}
+
+.cards__inner {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 1100px) {
+  .cards__inner {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+}
+
+.preview-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: var(--opacity, 0);
+  -webkit-mask: radial-gradient(
+    25rem 25rem at var(--x) var(--y),
+    #000 1%,
+    transparent 40%
+  );
+  mask: radial-gradient(
+    25rem 25rem at var(--x) var(--y),
+    #000 1%,
+    transparent 40%
+  );
+  transition: 400ms mask ease;
+  will-change: mask;
+}
+
+.preview-overlay .cell {
+  background-color: hsla(var(--hue), var(--saturation), var(--lightness), 0.3);
+  border-color: hsla(var(--hue), var(--saturation), var(--lightness), 1);
+  box-shadow: 0 0 0 1px inset hsla(var(--hue), var(--saturation), var(--lightness), 1);
+}
+
+:not(.preview-overlay) > .cards__inner > .preview-card {
+  transition: 400ms background ease;
+}
+
+:not(.preview-overlay) > .cards__inner > .preview-card:hover {
+  background: hsla(var(--hue), var(--saturation), var(--lightness), 0.1);
+}
+
+/* 特定按钮的永久黄色底部高亮效果 */
+.btn-with-yellow-highlight {
+  position: relative;
+  box-shadow: 0 3px 0 0 #fff90a !important;
+}
+
+.btn-with-yellow-highlight:hover {
+  box-shadow: 0 3px 0 0 #fff90a !important;
+}
+
+.btn-with-yellow-highlight:active {
+  box-shadow: 0 1px 0 0 #fff90a !important;
+  transform: translateY(2px) !important;
+}

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字上下颠倒检测报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        .container { max-width: 1600px; margin: 0 auto; }
+        .header { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 30px; 
+            text-align: center; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1); 
+            margin-bottom: 30px; 
+        }
+        .header h1 { color: #667eea; font-size: 36px; margin-bottom: 10px; }
+        .subtitle { color: #666; font-size: 16px; margin-bottom: 20px; line-height: 1.6; }
+        
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card.alert {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+        }
+        
+        .summary-card.success {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+        }
+        
+        .summary-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .digit-list {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .digit-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .digit-card.problem {
+            border: 3px solid #ffc107;
+            background: #fffbf0;
+        }
+        
+        .digit-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #f0f0f0;
+        }
+        
+        .digit-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .status-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .badge-ok { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-error { background: #f8d7da; color: #721c24; }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .version {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            background: white;
+        }
+        
+        .version h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .svg-box {
+            width: 100%;
+            height: 250px;
+            background: #fafafa;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .coordinate-overlay {
+            position: absolute;
+            font-size: 12px;
+            color: #999;
+            font-family: monospace;
+        }
+        
+        .coord-top { top: 5px; left: 50%; transform: translateX(-50%); }
+        .coord-bottom { bottom: 5px; left: 50%; transform: translateX(-50%); }
+        
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .info-table td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-table td:first-child {
+            font-weight: bold;
+            color: #666;
+            width: 120px;
+        }
+        
+        .alert-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .alert-box h5 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .alert-box ul {
+            color: #856404;
+            margin-left: 20px;
+        }
+        
+        .error-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .error-box h5 {
+            color: #721c24;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .error-box ul {
+            color: #721c24;
+            margin-left: 20px;
+        }
+        
+        .coordinate-label {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            font-family: monospace;
+            margin: 2px;
+        }
+        
+        .coord-start { background: #d4edda; color: #155724; }
+        .coord-end { background: #f8d7da; color: #721c24; }
+        
+        .legend {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .legend h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .legend-content {
+            line-height: 1.8;
+            color: #666;
+        }
+        
+        .arrow-up { color: #28a745; font-size: 20px; }
+        .arrow-down { color: #dc3545; font-size: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 数字上下颠倒检测报告</h1>
+            <p class="subtitle">
+                <strong>MMH坐标系统说明：</strong><br>
+                Y坐标小值 (208) = 顶部 ↑ &nbsp;|&nbsp; Y坐标大值 (568) = 底部 ↓<br>
+                正常数字应该在此范围内，并从合理的位置开始绘制
+            </p>
+        </div>
+
+        <div class="summary" id="summary">
+            <!-- 动态生成 -->
+        </div>
+
+        <div id="digit-details">
+            <!-- 动态生成 -->
+        </div>
+
+        <div class="legend">
+            <h3>📖 判断标准</h3>
+            <div class="legend-content">
+                <p><strong>各数字的预期起始位置：</strong></p>
+                <ul>
+                    <li><strong>数字 0：</strong>椭圆形，可从任何位置开始</li>
+                    <li><strong>数字 1：</strong>应从顶部开始，向下绘制 (Y: 568→208 或接近)</li>
+                    <li><strong>数字 2：</strong>应从顶部横线开始 (Y接近568)</li>
+                    <li><strong>数字 3：</strong>应从顶部开始 (Y接近568)</li>
+                    <li><strong>数字 4：</strong>可从底部或顶部开始</li>
+                    <li><strong>数字 5：</strong>应从顶部横线开始 (Y接近568)</li>
+                    <li><strong>数字 6：</strong>应从顶部开始，向下画圆 (Y接近568)</li>
+                    <li><strong>数字 7：</strong>应从顶部横线开始 (Y接近568)</li>
+                    <li><strong>数字 8：</strong>8字形，起点较灵活</li>
+                    <li><strong>数字 9：</strong>通常从底部或圆圈开始 (Y接近208)</li>
+                </ul>
+                <p style="margin-top: 15px;"><strong>颠倒判断依据：</strong></p>
+                <ul>
+                    <li>如果数字应该从顶部开始但实际从底部开始，则可能颠倒</li>
+                    <li>如果数字的起点位置与预期相差较大，则标记为异常</li>
+                    <li>Y坐标超出正常范围 (150-620) 也视为异常</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fullOriginalData = {"0": {"character": "0", "medians": [[[412, 568], [412, 528], [412, 488], [412, 448], [412, 408], [412, 368], [412, 328], [412, 288], [412, 248], [412, 208], [612, 208], [612, 248], [612, 288], [612, 328], [612, 368], [612, 408], [612, 448], [612, 488], [612, 528], [612, 568], [412, 568]]]}, "1": {"character": "1", "medians": [[[512, 568], [512, 528], [512, 488], [512, 448], [512, 408], [512, 368], [512, 328], [512, 288], [512, 248], [512, 208]]]}, "2": {"character": "2", "medians": [[[424, 568], [462, 568], [512, 568], [562, 568], [599, 568], [599, 488], [599, 408], [562, 328], [512, 268], [462, 228], [424, 208], [462, 208], [512, 208], [562, 208], [599, 208]]]}, "3": {"character": "3", "medians": [[[424, 568], [462, 568], [512, 568], [562, 568], [599, 568], [599, 488], [599, 408], [562, 388], [512, 388]], [[512, 388], [562, 388], [599, 368], [599, 288], [599, 208], [562, 208], [512, 208], [462, 208], [424, 208]]]}, "4": {"character": "4", "medians": [[[599, 208], [599, 288], [599, 368], [599, 448], [599, 528], [599, 568], [512, 568], [424, 568]], [[599, 388], [562, 388], [512, 388], [462, 388], [424, 388]]]}, "5": {"character": "5", "medians": [[[599, 568], [562, 568], [512, 568], [462, 568], [424, 568], [424, 488], [424, 408]], [[424, 408], [462, 408], [512, 408], [562, 408], [599, 408], [599, 328], [599, 248], [599, 208], [562, 208], [512, 208], [462, 208], [424, 208]]]}, "6": {"character": "6", "medians": [[[599, 568], [562, 568], [512, 568], [462, 568], [424, 568], [424, 488], [424, 408], [424, 328], [424, 248], [424, 208], [462, 208], [512, 208], [562, 208], [599, 208], [599, 288], [599, 368], [599, 388], [562, 388], [512, 388], [462, 388], [424, 388]]]}, "7": {"character": "7", "medians": [[[424, 568], [462, 568], [512, 568], [562, 568], [599, 568], [599, 488], [562, 388], [512, 308], [462, 228], [424, 208]]]}, "8": {"character": "8", "medians": [[[424, 568], [462, 568], [512, 568], [562, 568], [599, 568], [599, 488], [599, 408], [562, 388], [512, 388], [462, 388], [424, 388], [424, 308], [424, 228], [424, 208], [462, 208], [512, 208], [562, 208], [599, 208], [599, 288], [599, 368], [599, 388]]]}, "9": {"character": "9", "medians": [[[599, 208], [562, 208], [512, 208], [462, 208], [424, 208], [424, 288], [424, 368], [424, 448], [424, 528], [424, 568], [462, 568], [512, 568], [562, 568], [599, 568], [599, 488], [599, 408], [599, 388], [562, 388], [512, 388], [462, 388], [424, 388]]]}};
+
+        const fullOptimizedData = {"0": {"character": "0", "medians": [[[612, 388], [610, 419], [605, 449], [598, 478], [588, 503], [576, 525], [562, 543], [546, 557], [529, 565], [512, 568], [494, 565], [477, 557], [462, 543], [447, 525], [435, 503], [425, 478], [418, 449], [413, 419], [412, 388], [413, 356], [418, 326], [425, 298], [435, 272], [447, 250], [461, 232], [477, 218], [494, 210], [512, 208], [529, 210], [546, 218], [561, 232], [576, 250], [588, 272], [598, 298], [605, 326], [610, 356], [612, 387]]]}, "1": {"character": "1", "medians": [[[512, 568], [512, 528], [512, 488], [512, 448], [512, 408], [512, 368], [512, 328], [512, 288], [512, 248], [512, 208]]]}, "2": {"character": "2", "medians": [[[599, 568], [559, 568], [512, 568], [464, 568], [435, 564], [444, 549], [472, 525], [502, 488], [532, 448], [560, 408], [581, 368], [595, 328], [599, 288], [599, 248], [591, 216], [559, 208], [512, 208], [464, 208], [424, 208]]]}, "3": {"character": "3", "medians": [[[424, 568], [462, 568], [512, 568], [562, 568], [599, 568], [599, 488], [599, 408], [562, 388], [512, 388]], [[512, 388], [562, 388], [599, 368], [599, 288], [599, 208], [562, 208], [512, 208], [462, 208], [424, 208]]]}, "4": {"character": "4", "medians": [[[599, 568], [575, 528], [550, 488], [525, 448], [500, 408], [475, 388], [450, 388], [424, 388], [462, 388], [512, 388], [562, 388], [599, 388]], [[599, 388], [599, 348], [599, 308], [599, 268], [599, 228], [599, 208]]]}, "5": {"character": "5", "medians": [[[599, 568], [559, 568], [512, 568], [464, 568], [431, 560], [424, 528], [424, 488], [424, 448], [431, 416], [462, 408], [500, 408], [540, 408], [575, 404], [595, 384], [599, 348], [599, 308], [599, 268], [595, 231], [577, 212], [548, 208], [512, 208], [473, 208], [441, 208], [424, 208]]]}, "6": {"character": "6", "medians": [[[424, 388], [462, 388], [512, 388], [562, 388], [599, 388], [599, 408], [599, 488], [599, 568], [562, 568], [512, 568], [462, 568], [424, 568], [424, 528], [424, 448], [424, 368], [424, 288], [424, 208], [462, 208], [512, 208], [562, 208], [599, 208]]]}, "7": {"character": "7", "medians": [[[424, 568], [440, 529], [460, 488], [480, 448], [500, 409], [520, 369], [540, 329], [560, 289], [579, 248], [590, 214], [560, 208], [512, 208], [463, 208], [424, 208]]]}, "8": {"character": "8", "medians": [[[592, 478], [587, 506], [573, 530], [552, 548], [525, 557], [498, 557], [471, 548], [450, 530], [436, 506], [432, 478], [436, 451], [450, 427], [472, 409], [498, 400], [525, 400], [552, 409], [573, 427], [587, 451], [592, 478]], [[582, 298], [577, 322], [565, 343], [547, 359], [524, 367], [499, 367], [477, 359], [458, 343], [446, 322], [442, 298], [446, 275], [458, 254], [477, 238], [499, 230], [524, 230], [547, 238], [565, 254], [577, 275], [582, 298]]]}, "9": {"character": "9", "medians": [[[424, 388], [462, 388], [512, 388], [562, 388], [599, 388], [599, 408], [599, 488], [599, 568], [562, 568], [512, 568], [462, 568], [424, 568], [424, 528], [424, 448], [424, 368], [424, 288], [424, 208], [462, 208], [512, 208], [562, 208], [599, 208]]]}};
+
+        const digitSpecs = {
+            '0': { expected: 'any', reason: '椭圆形，可从任何位置开始', okRange: null },
+            '1': { expected: 'top', reason: '从顶部向下绘制', okRange: [500, 568] },
+            '2': { expected: 'top', reason: '从顶部横线开始', okRange: [500, 568] },
+            '3': { expected: 'top', reason: '从顶部开始', okRange: [500, 568] },
+            '4': { expected: 'any', reason: '可从顶部或底部', okRange: null },
+            '5': { expected: 'top', reason: '从顶部横线开始', okRange: [500, 568] },
+            '6': { expected: 'top', reason: '从顶部开始', okRange: [500, 568] },
+            '7': { expected: 'top', reason: '从顶部横线开始', okRange: [500, 568] },
+            '8': { expected: 'any', reason: '8字形，较灵活', okRange: null },
+            '9': { expected: 'bottom', reason: '从底部圆圈开始', okRange: [208, 350] }
+        };
+
+        function analyzeDigit(digit, data, type) {
+            const spec = digitSpecs[digit];
+            const firstStroke = data.medians[0];
+            const startPoint = firstStroke[0];
+            const endPoint = firstStroke[firstStroke.length - 1];
+            const startY = startPoint[1];
+            
+            // 获取所有Y坐标
+            const allY = [];
+            data.medians.forEach(stroke => {
+                stroke.forEach(point => allY.push(point[1]));
+            });
+            const minY = Math.min(...allY);
+            const maxY = Math.max(...allY);
+            
+            let status = 'ok';
+            let issues = [];
+            
+            // 检查Y范围
+            if (minY < 150 || maxY > 620) {
+                issues.push(`Y坐标超出正常范围 (${minY.toFixed(0)}, ${maxY.toFixed(0)})`);
+                status = 'warning';
+            }
+            
+            // 检查起点位置
+            if (spec.okRange) {
+                if (startY < spec.okRange[0] || startY > spec.okRange[1]) {
+                    issues.push(`起点Y=${startY}，预期${spec.okRange[0]}-${spec.okRange[1]}`);
+                    status = 'error';
+                }
+            }
+            
+            return {
+                startPoint,
+                endPoint,
+                startY,
+                minY,
+                maxY,
+                status,
+                issues,
+                spec
+            };
+        }
+
+        function createSVG(data, width, height) {
+            let paths = '';
+            
+            data.medians.forEach((stroke, idx) => {
+                let pathData = '';
+                stroke.forEach((point, index) => {
+                    const x = (point[0] - 350) / 300 * width * 0.8 + width * 0.1;
+                    const y = (point[1] - 150) / 500 * height * 0.8 + height * 0.1;
+                    pathData += (index === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1) + ' ';
+                });
+                
+                // 起点标记
+                const firstX = (stroke[0][0] - 350) / 300 * width * 0.8 + width * 0.1;
+                const firstY = (stroke[0][1] - 150) / 500 * height * 0.8 + height * 0.1;
+                
+                paths += `<path d="${pathData}" stroke="#2196F3" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+                paths += `<circle cx="${firstX}" cy="${firstY}" r="4" fill="#28a745" />`;
+            });
+            
+            return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${paths}</svg>`;
+        }
+
+        function renderReport() {
+            const problemDigits = [];
+            const okDigits = [];
+            
+            for (let i = 0; i <= 9; i++) {
+                const digit = i.toString();
+                const origAnalysis = analyzeDigit(digit, fullOriginalData[digit], '原始');
+                const optAnalysis = analyzeDigit(digit, fullOptimizedData[digit], '优化');
+                
+                if (origAnalysis.status === 'error' || optAnalysis.status === 'error') {
+                    problemDigits.push(digit);
+                } else {
+                    okDigits.push(digit);
+                }
+            }
+            
+            // 渲染摘要
+            const summaryHTML = `
+                <div class="summary-card ${problemDigits.length > 0 ? 'alert' : 'success'}">
+                    <h3>🔴 发现问题的数字</h3>
+                    ${problemDigits.length > 0 ? 
+                        `<div class="digit-list">${problemDigits.join(', ')}</div>
+                         <p style="color: #856404; margin-top: 10px;">这些数字的起点位置可能不符合预期</p>` :
+                        `<div class="digit-list" style="color: #28a745;">无</div>
+                         <p style="color: #155724; margin-top: 10px;">所有数字都正常！</p>`}
+                </div>
+                <div class="summary-card success">
+                    <h3>✅ 正常的数字</h3>
+                    <div class="digit-list" style="color: #28a745;">${okDigits.join(', ')}</div>
+                    <p style="color: #155724; margin-top: 10px;">这些数字的朝向和起点位置正常</p>
+                </div>
+            `;
+            document.getElementById('summary').innerHTML = summaryHTML;
+            
+            // 渲染每个数字的详细信息
+            const detailsContainer = document.getElementById('digit-details');
+            detailsContainer.innerHTML = '';
+            
+            for (let i = 0; i <= 9; i++) {
+                const digit = i.toString();
+                const origData = fullOriginalData[digit];
+                const optData = fullOptimizedData[digit];
+                const origAnalysis = analyzeDigit(digit, origData, '原始');
+                const optAnalysis = analyzeDigit(digit, optData, '优化');
+                
+                const hasProblem = origAnalysis.status === 'error' || optAnalysis.status === 'error';
+                
+                const card = document.createElement('div');
+                card.className = `digit-card ${hasProblem ? 'problem' : ''}`;
+                
+                let statusBadges = '';
+                if (origAnalysis.status === 'ok' && optAnalysis.status === 'ok') {
+                    statusBadges = '<span class="badge badge-ok">✓ 正常</span>';
+                } else if (origAnalysis.status === 'error' || optAnalysis.status === 'error') {
+                    statusBadges = '<span class="badge badge-error">⚠️ 可能颠倒</span>';
+                } else {
+                    statusBadges = '<span class="badge badge-warning">! 需要检查</span>';
+                }
+                
+                let issuesHTML = '';
+                const allIssues = [...origAnalysis.issues, ...optAnalysis.issues];
+                if (allIssues.length > 0) {
+                    issuesHTML = `
+                        <div class="${origAnalysis.status === 'error' || optAnalysis.status === 'error' ? 'error' : 'alert'}-box">
+                            <h5>⚠️ 发现的问题：</h5>
+                            <ul>
+                                ${origAnalysis.issues.map(issue => `<li>原始版本: ${issue}</li>`).join('')}
+                                ${optAnalysis.issues.map(issue => `<li>优化版本: ${issue}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                card.innerHTML = `
+                    <div class="digit-header">
+                        <div class="digit-title">数字 ${digit}</div>
+                        <div class="status-badges">${statusBadges}</div>
+                    </div>
+                    
+                    <div class="comparison">
+                        <div class="version">
+                            <h4>📝 原始版本</h4>
+                            <div class="svg-box">
+                                ${createSVG(origData, 230, 230)}
+                                <div class="coordinate-overlay coord-top">Y=208 (顶部)</div>
+                                <div class="coordinate-overlay coord-bottom">Y=568 (底部)</div>
+                            </div>
+                            <table class="info-table">
+                                <tr><td>起点坐标:</td><td>
+                                    <span class="coordinate-label coord-start">[${origAnalysis.startPoint.join(', ')}]</span>
+                                    Y=${origAnalysis.startY}
+                                </td></tr>
+                                <tr><td>终点坐标:</td><td>
+                                    <span class="coordinate-label coord-end">[${origAnalysis.endPoint.join(', ')}]</span>
+                                </td></tr>
+                                <tr><td>Y坐标范围:</td><td>${origAnalysis.minY.toFixed(0)} - ${origAnalysis.maxY.toFixed(0)}</td></tr>
+                                <tr><td>期望起点:</td><td>${origAnalysis.spec.reason}</td></tr>
+                            </table>
+                        </div>
+                        
+                        <div class="version">
+                            <h4>✨ 优化版本</h4>
+                            <div class="svg-box">
+                                ${createSVG(optData, 230, 230)}
+                                <div class="coordinate-overlay coord-top">Y=208 (顶部)</div>
+                                <div class="coordinate-overlay coord-bottom">Y=568 (底部)</div>
+                            </div>
+                            <table class="info-table">
+                                <tr><td>起点坐标:</td><td>
+                                    <span class="coordinate-label coord-start">[${optAnalysis.startPoint.join(', ')}]</span>
+                                    Y=${optAnalysis.startY}
+                                </td></tr>
+                                <tr><td>终点坐标:</td><td>
+                                    <span class="coordinate-label coord-end">[${optAnalysis.endPoint.join(', ')}]</span>
+                                </td></tr>
+                                <tr><td>Y坐标范围:</td><td>${optAnalysis.minY.toFixed(0)} - ${optAnalysis.maxY.toFixed(0)}</td></tr>
+                                <tr><td>期望起点:</td><td>${optAnalysis.spec.reason}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    ${issuesHTML}
+                `;
+                
+                detailsContainer.appendChild(card);
+            }
+        }
+
+        window.onload = renderReport;
+    </script>
+</body>
+</html>
+

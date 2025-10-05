@@ -1,0 +1,55 @@
+/* 自定义下拉菜单样式 */
+.preset-controls {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  position: relative;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 12px;
+  color: var(--fg-0);
+  gap: 8px;
+}
+
+.dropdown-item:hover {
+  background: var(--glass-2);
+}
+
+.custom-item {
+  font-weight: 500;
+  color: #fff90a;
+}
+
+.custom-item:hover {
+  background: rgba(255, 249, 10, 0.1);
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.preset-item-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.preset-name-dropdown {
+  flex: 1;
+  text-align: left;
+}
+
+.preset-time {
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: 8px;
+}

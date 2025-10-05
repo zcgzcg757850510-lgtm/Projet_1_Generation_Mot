@@ -1,0 +1,133 @@
+<!-- Instructions Modal -->
+<div id="instructionsModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 600px; width: 90%;">
+        <div class="modal-header">
+            <h2>🔍 使用说明</h2>
+            <button type="button" class="close-btn" onclick="closeInstructionsModal()">&times;</button>
+        </div>
+        
+        <div class="modal-body" style="padding: 20px; line-height: 1.6;">
+            
+            <div class="instruction-section">
+                <h3>📝 基本使用</h3>
+                <div class="steps">
+                    <p><strong>1.</strong> 在字符框里输入一个汉字</p>
+                    <p><strong>2.</strong> 点击 <span class="btn-highlight">C</span> 按钮生成字符</p>
+                    <p><strong>3.</strong> 查看五个预览窗口的效果</p>
+                </div>
+            </div>
+
+            <div class="instruction-section">
+                <h3>🎨 窗口说明</h3>
+                <div class="window-guide">
+                    <p><strong>A窗口：</strong>显示字符轮廓</p>
+                    <p><strong>B窗口：</strong>显示原始中轴</p>
+                    <p><strong>C窗口：</strong>显示处理中轴</p>
+                    <p><strong>D1窗口：</strong>显示网格变形</p>
+                    <p><strong>D2窗口：</strong>显示中轴填充</p>
+                </div>
+            </div>
+
+            <div class="instruction-section">
+                <h3>🔧 按钮功能</h3>
+                <div class="button-guide">
+                    <p><strong>C：</strong>生成基础字符</p>
+                    <p><strong>D1：</strong>生成高级效果</p>
+                    <p><strong>D2：</strong>生成特殊变形</p>
+                    <p><strong>网格变形：</strong>打开变形工具</p>
+                    <p><strong>重置：</strong>恢复默认设置</p>
+                </div>
+            </div>
+
+            <div class="instruction-section">
+                <h3>🖼️ 窗口操作</h3>
+                <div class="window-ops">
+                    <p><strong>⛶ 按钮：</strong>点击放大窗口，再点击恢复</p>
+                    <p><strong>图片点击：</strong>打开大图查看</p>
+                    <p><strong>拖拽：</strong>在变形工具中移动控制点</p>
+                </div>
+            </div>
+
+            <div class="instruction-section">
+                <h3>⚙️ 参数调整</h3>
+                <div class="params-guide">
+                    <p><strong>选择标签页：</strong>起笔、中间、笔锋、原始中轴、处理中轴</p>
+                    <p><strong>勾选功能：</strong>打开需要的处理选项</p>
+                    <p><strong>调整数值：</strong>修改参数改变效果</p>
+                    <p><strong>实时预览：</strong>重新生成查看变化</p>
+                </div>
+            </div>
+
+            <div class="instruction-section">
+                <h3>💡 使用技巧</h3>
+                <div class="tips">
+                    <p><strong>提示1：</strong>先用默认设置生成，再调整参数</p>
+                    <p><strong>提示2：</strong>每次修改后重新点击生成按钮</p>
+                    <p><strong>提示3：</strong>使用预设管理保存常用设置</p>
+                    <p><strong>提示4：</strong>网格变形可以精细调整字形</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-footer" style="text-align: center; padding: 15px;">
+            <button type="button" onclick="closeInstructionsModal()" class="btn-primary">知道了</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.instruction-section {
+    margin-bottom: 25px;
+    padding: 15px;
+    background: var(--glass);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.instruction-section h3 {
+    margin: 0 0 12px 0;
+    color: var(--fg-0);
+    font-size: 16px;
+}
+
+.instruction-section p {
+    margin: 8px 0;
+    color: var(--fg-0);
+    font-size: 14px;
+}
+
+.btn-highlight {
+    background: var(--glass-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.steps p, .window-guide p, .button-guide p, .window-ops p, .params-guide p, .tips p {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.steps p:last-child, .window-guide p:last-child, .button-guide p:last-child, 
+.window-ops p:last-child, .params-guide p:last-child, .tips p:last-child {
+    border-bottom: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+</style>

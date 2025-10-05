@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统完整性检查 - Generateur_Mot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #0e0f12;
+            color: #eaeaea;
+        }
+        .check-container {
+            background: #111317;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+        .status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .success { background-color: #28a745; }
+        .error { background-color: #dc3545; }
+        .warning { background-color: #ffc107; }
+        .info { background-color: #17a2b8; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+        .test-success { background-color: rgba(40, 167, 69, 0.1); border-color: #28a745; }
+        .test-error { background-color: rgba(220, 53, 69, 0.1); border-color: #dc3545; }
+        .test-warning { background-color: rgba(255, 193, 7, 0.1); border-color: #ffc107; }
+        .test-info { background-color: rgba(23, 162, 184, 0.1); border-color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>🔧 系统完整性检查</h1>
+    
+    <div class="check-container">
+        <h2>📦 CSS样式检查</h2>
+        <div id="cssStatus">正在检查CSS文件...</div>
+        <button onclick="checkCSS()">重新检查CSS</button>
+    </div>
+    
+    <div class="check-container">
+        <h2>📄 HTML模板检查</h2>
+        <div id="htmlStatus">正在检查HTML模板...</div>
+        <button onclick="checkHTML()">重新检查HTML</button>
+    </div>
+    
+    <div class="check-container">
+        <h2>⚙️ JavaScript模块检查</h2>
+        <div id="jsStatus">正在检查JavaScript模块...</div>
+        <button onclick="checkJS()">重新检查JS</button>
+    </div>
+    
+    <div class="check-container">
+        <h2>🎯 功能测试</h2>
+        <button onclick="testToast()">测试提示系统</button>
+        <button onclick="testModal()">测试模态框</button>
+        <button onclick="testPreview()">测试预览功能</button>
+        <button onclick="testGrid()">测试网格变形</button>
+        <div id="functionTests"></div>
+    </div>
+    
+    <div class="check-container">
+        <h2>📊 系统信息</h2>
+        <div id="systemInfo">
+            <p><strong>检查时间:</strong> <span id="checkTime"></span></p>
+            <p><strong>浏览器:</strong> <span id="browserInfo"></span></p>
+            <p><strong>页面URL:</strong> <span id="pageUrl"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const startTime = performance.now();
+        
+        // CSS文件列表
+        const cssFiles = [
+            'css/base.css',
+            'css/layout.css', 
+            'css/components.css',
+            'css/forms.css',
+            'css/tooltips.css',
+            'css/toast.css',
+            'css/modal.css',
+            'css/preview-cards.css',
+            'css/preview-effects.css',
+            'css/dropdown.css'
+        ];
+        
+        // HTML模板文件列表
+        const htmlFiles = [
+            'html/modals/preset-modal.html',
+            'html/modals/article-modal.html',
+            'html/modals/grid-transform-modal.html',
+            'html/modals/image-modal.html'
+        ];
+        
+        // JavaScript模块列表
+        const jsFiles = [
+            'js/utils.js',
+            'js/state-manager.js',
+            'js/preset-modal.js',
+            'js/modal-loader.js',
+            'js/modal-manager.js',
+            'js/mesh-deformation.js',
+            'js/grid-transform.js',
+            'js/grid-state-manager.js',
+            'js/drag-transform.js',
+            'js/article-generator.js',
+            'js/generation-service.js',
+            'js/preview-manager.js',
+            'js/preview-effects.js',
+            'js/test-utils.js',
+            'js/params-manager.js',
+            'js/generation-manager.js'
+        ];
+        
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result test-${type}`;
+            div.innerHTML = `<span class="status ${type}"></span>${message}`;
+            container.appendChild(div);
+        }
+        
+        async function checkFiles(files, containerId, fileType) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<p>正在检查${fileType}文件...</p>`;
+            
+            let successCount = 0;
+            let totalCount = files.length;
+            
+            for (const file of files) {
+                try {
+                    const response = await fetch(file + '?t=' + Date.now());
+                    if (response.ok) {
+                        successCount++;
+                        addResult(containerId, `✅ ${file} - 加载成功`, 'success');
+                    } else {
+                        addResult(containerId, `❌ ${file} - HTTP ${response.status}`, 'error');
+                    }
+                } catch (e) {
+                    addResult(containerId, `❌ ${file} - 加载失败: ${e.message}`, 'error');
+                }
+            }
+            
+            const summary = `${fileType}检查完成: ${successCount}/${totalCount} 个文件加载成功`;
+            const summaryType = successCount === totalCount ? 'success' : 'warning';
+            addResult(containerId, summary, summaryType);
+        }
+        
+        async function checkCSS() {
+            await checkFiles(cssFiles, 'cssStatus', 'CSS');
+        }
+        
+        async function checkHTML() {
+            await checkFiles(htmlFiles, 'htmlStatus', 'HTML模板');
+        }
+        
+        async function checkJS() {
+            await checkFiles(jsFiles, 'jsStatus', 'JavaScript');
+        }
+        
+        function testToast() {
+            try {
+                if (typeof window.toastManager !== 'undefined') {
+                    window.toastManager.show('generate.success');
+                    addResult('functionTests', '✅ 提示系统测试成功', 'success');
+                } else {
+                    addResult('functionTests', '❌ 提示系统未加载', 'error');
+                }
+            } catch (e) {
+                addResult('functionTests', `❌ 提示系统测试失败: ${e.message}`, 'error');
+            }
+        }
+        
+        function testModal() {
+            try {
+                if (typeof window.openPresetModal === 'function') {
+                    addResult('functionTests', '✅ 模态框系统可用', 'success');
+                } else {
+                    addResult('functionTests', '❌ 模态框系统未加载', 'error');
+                }
+            } catch (e) {
+                addResult('functionTests', `❌ 模态框测试失败: ${e.message}`, 'error');
+            }
+        }
+        
+        function testPreview() {
+            try {
+                if (typeof window.previewManager !== 'undefined') {
+                    addResult('functionTests', '✅ 预览管理器可用', 'success');
+                } else {
+                    addResult('functionTests', '❌ 预览管理器未加载', 'error');
+                }
+            } catch (e) {
+                addResult('functionTests', `❌ 预览功能测试失败: ${e.message}`, 'error');
+            }
+        }
+        
+        function testGrid() {
+            try {
+                if (typeof window.gridTransform !== 'undefined') {
+                    addResult('functionTests', '✅ 网格变形系统可用', 'success');
+                } else {
+                    addResult('functionTests', '❌ 网格变形系统未加载', 'error');
+                }
+            } catch (e) {
+                addResult('functionTests', `❌ 网格变形测试失败: ${e.message}`, 'error');
+            }
+        }
+        
+        function updateSystemInfo() {
+            document.getElementById('checkTime').textContent = new Date().toLocaleString('zh-CN');
+            document.getElementById('browserInfo').textContent = navigator.userAgent.split(' ')[0];
+            document.getElementById('pageUrl').textContent = window.location.href;
+        }
+        
+        // 页面加载完成后自动执行检查
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSystemInfo();
+            
+            setTimeout(async () => {
+                await checkCSS();
+                await checkHTML();
+                await checkJS();
+                
+                addResult('functionTests', '🚀 系统检查完成，可以开始功能测试', 'info');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

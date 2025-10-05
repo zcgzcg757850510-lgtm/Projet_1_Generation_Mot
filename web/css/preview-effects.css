@@ -1,0 +1,82 @@
+/* 预览卡片悬停效果样式 */
+.preview-cards {
+    position: relative;
+}
+
+.preview-card {
+    transition: 400ms background ease;
+    will-change: background;
+}
+
+.preview-card[data-card="A"] {
+    --hue: 210;
+    --saturation: 100%;
+    --lightness: 60%;
+}
+
+.preview-card[data-card="B"] {
+    --hue: 120;
+    --saturation: 100%;
+    --lightness: 50%;
+}
+
+.preview-card[data-card="C"] {
+    --hue: 45;
+    --saturation: 100%;
+    --lightness: 55%;
+}
+
+.preview-card[data-card="D1"] {
+    --hue: 0;
+    --saturation: 100%;
+    --lightness: 60%;
+}
+
+.preview-card[data-card="D2"] {
+    --hue: 270;
+    --saturation: 100%;
+    --lightness: 65%;
+}
+
+.preview-card:hover {
+    background: hsla(var(--hue), var(--saturation), var(--lightness), 0.1);
+    border-color: hsla(var(--hue), var(--saturation), var(--lightness), 0.3);
+}
+
+.cards__inner {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+@media (max-width: 1100px) {
+    .cards__inner {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+    }
+}
+
+.preview-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    user-select: none;
+    opacity: var(--opacity, 0);
+    -webkit-mask: radial-gradient(
+        25rem 25rem at var(--x) var(--y),
+        #000 1%,
+        transparent 40%
+    );
+    mask: radial-gradient(
+        25rem 25rem at var(--x) var(--y),
+        #000 1%,
+        transparent 40%
+    );
+    transition: 400ms mask ease;
+    will-change: mask;
+}
+
+.preview-overlay .cell {
+    background-color: hsla(var(--hue), var(--saturation), var(--lightness), 0.3);
+    border-color: hsla(var(--hue), var(--saturation), var(--lightness), 1);
+    box-shadow: 0 0 0 1px inset hsla(var(--hue), var(--saturation), var(--lightness), 1);
+}

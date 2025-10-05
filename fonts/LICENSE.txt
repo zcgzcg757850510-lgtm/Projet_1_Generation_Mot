@@ -1,0 +1,13 @@
+开源字体许可证信息
+======================================================================
+
+Roboto-Regular:
+  描述: Google Roboto字体（开源，Apache License 2.0）
+  来源: https://github.com/google/roboto/raw/main/src/hinted/Roboto-Regular.ttf
+  许可证: 开源（详见字体项目）
+
+SourceSansPro-Regular:
+  描述: Adobe Source Sans Pro字体（开源，OFL）
+  来源: https://github.com/adobe-fonts/source-sans/raw/release/TTF/SourceSans3-Regular.ttf
+  许可证: 开源（详见字体项目）
+

@@ -1,0 +1,11 @@
+﻿output/
+logs/
+__pycache__/
+*.log
+mmh_pipeline/data/mmh_raw/
+mmh_pipeline/data/hanzi_data_full.json
+output/tmp/
+output/temp/
+*.pyc
+.vscode/
+output/preview/

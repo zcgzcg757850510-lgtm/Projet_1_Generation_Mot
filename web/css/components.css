@@ -1,0 +1,285 @@
+/* 标签页样式 */
+.tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  padding: 6px 2px;
+  margin-bottom: 10px;
+}
+
+.tabs button {
+  border: none;
+  background: transparent;
+  color: #ddd;
+  padding: 8px 10px;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  color: #fff;
+  border-color: #fff90a;
+}
+
+/* 表单元素样式 */
+label {
+  color: var(--fg-0);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+label > input[type=text], 
+label > input[type=number] {
+  max-width: 140px;
+}
+
+input[type=text],
+input[type=number] {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border); 
+  padding: 10px 12px;
+  background: rgba(255,255,255,.06);
+  color: var(--fg-0);
+  outline: none;
+  position: relative;
+}
+
+input::placeholder {
+  color: #9a9a9a;
+} 
+
+input:focus {
+  border-color: #fff90a; 
+  box-shadow: 0 0 0 3px rgba(255,255,255,.08);
+}
+
+/* 按钮样式 */
+button {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--fg-0);
+  background: rgba(255,255,255,.12); 
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all .15s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+button:hover {
+  background: rgba(255,255,255,.20);
+  transform: translateY(-1px);
+} 
+
+button:active {
+  transform: translateY(0);
+}
+
+/* 特殊按钮样式 */
+#btnApplyMeshTransform {
+  background: rgba(76,175,80,.15);
+  border-color: rgba(76,175,80,.3);
+  color: #000;
+}
+
+#btnApplyMeshTransform:hover {
+  background: rgba(76,175,80,.25);
+}
+
+#btnResetMeshTransform {
+  background: rgba(244,67,54,.15);
+  border-color: rgba(244,67,54,.3);
+  color: #000;
+}
+
+#btnResetMeshTransform:hover {
+  background: rgba(244,67,54,.25);
+}
+
+#btnSaveMeshPreset {
+  background: rgba(33,150,243,.15);
+  border-color: rgba(33,150,243,.3);
+  color: #000;
+}
+
+#btnSaveMeshPreset:hover {
+  background: rgba(33,150,243,.25);
+}
+
+#btnLoadMeshPreset {
+  background: rgba(255,193,7,.15);
+  border-color: rgba(255,193,7,.3);
+  color: #000;
+}
+
+#btnLoadMeshPreset:hover {
+  background: rgba(255,193,7,.25);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  justify-content: flex-start;
+}
+
+/* Styles pour les boutons dans la section actions */
+.actions button {
+  padding: 8px 12px;
+  min-width: 60px;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--glass);
+  color: var(--fg-0);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.actions button:hover {
+  background: var(--glass-2);
+  border-color: rgba(255,255,255,.25);
+  transform: translateY(-1px);
+}
+
+.actions button:active {
+  transform: translateY(0);
+  background: rgba(255,255,255,.05);
+}
+
+/* 复选框样式 */
+.ctrl-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 160px;
+  align-items: center;
+  column-gap: 12px;
+  margin: 8px 0;
+}
+
+.ctrl-row .checkbox-btn {
+  margin-bottom: 0; 
+  padding-left: 0;
+}
+
+.ctrl-row .checkbox-btn .checkmark {
+  left: 0;
+}
+
+.ctrl-row .param {
+  max-width: 160px;
+}
+
+.checkbox-btn {
+  display: block;
+  position: relative;
+  padding-left: 30px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.checkbox-btn input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkbox-btn .label-text {
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  border: 2.5px solid #ffffff;
+  transition: .2s linear;
+  border-radius: 6px;
+}
+
+.checkbox-btn input:checked ~ .checkmark {
+  background-color: transparent;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  left: 50%;
+  top: 40%;
+  width: 10px;
+  height: 14px;
+  border: 2px solid #0ea021;
+  filter: drop-shadow(0 0 10px #0ea021);
+  border-width: 0 2.5px 2.5px 0;
+  transition: .2s linear;
+  transform: translate(-50%,-50%) rotate(-90deg) scale(.2);
+}
+
+.checkbox-btn input:checked ~ .checkmark:after {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%,-50%) rotate(45deg) scale(1);
+}
+
+/* 工具提示样式 */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 280px;
+  background-color: #1a1c20;
+  color: #fff;
+  text-align: left;
+  border-radius: 8px;
+  padding: 8px 12px;
+  position: absolute;
+  z-index: 1000;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -140px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: 8px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #1a1c20 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}

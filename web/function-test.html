@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>函数导出测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .test-result { margin: 10px 0; padding: 10px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        button { margin: 5px; padding: 8px 15px; }
+    </style>
+</head>
+<body>
+    <h1>JavaScript函数导出测试</h1>
+    
+    <div class="test-section">
+        <h2>核心生成函数测试</h2>
+        <button onclick="testFunction('genOnce')">测试 genOnce()</button>
+        <button onclick="testFunction('generateD2FromGrid')">测试 generateD2FromGrid()</button>
+        <button onclick="testFunction('generateArticle')">测试 generateArticle()</button>
+        <div id="generation-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>模态框函数测试</h2>
+        <button onclick="testFunction('openDragTransformModal')">测试 openDragTransformModal()</button>
+        <button onclick="testFunction('openPresetModal')">测试 openPresetModal()</button>
+        <button onclick="testFunction('openArticleModal')">测试 openArticleModal()</button>
+        <div id="modal-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>网格变形函数测试</h2>
+        <button onclick="testFunction('openGridTransformModal')">测试 openGridTransformModal()</button>
+        <button onclick="testFunction('resetGridTransform')">测试 resetGridTransform()</button>
+        <div id="grid-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>状态管理函数测试</h2>
+        <button onclick="testFunction('resetParams')">测试 resetParams()</button>
+        <button onclick="testFunction('showToast')">测试 showToast()</button>
+        <div id="state-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>模块对象测试</h2>
+        <button onclick="testObject('StateManager')">测试 StateManager</button>
+        <button onclick="testObject('GridStateManager')">测试 GridStateManager</button>
+        <button onclick="testObject('toastManager')">测试 toastManager</button>
+        <div id="object-results"></div>
+    </div>
+
+    <!-- 引入所有JavaScript模块 -->
+    <script src="js/utils.js"></script>
+    <script src="js/test-utils.js"></script>
+    <script src="js/state-manager.js"></script>
+    <script src="js/modal-loader.js"></script>
+    <script src="js/modal-manager.js"></script>
+    <script src="js/preset-modal.js"></script>
+    <script src="js/mesh-deformation.js"></script>
+    <script src="js/grid-transform.js"></script>
+    <script src="js/grid-state-manager.js"></script>
+    <script src="js/drag-transform.js"></script>
+    <script src="js/article-generator.js"></script>
+    <script src="js/generation-service.js"></script>
+    <script src="js/preview-manager.js"></script>
+    <script src="js/preview-effects.js"></script>
+    <script src="js/params-manager.js"></script>
+    <script src="js/generation-manager.js"></script>
+
+    <script>
+        function testFunction(funcName) {
+            const resultDiv = getResultDiv(funcName);
+            
+            try {
+                if (typeof window[funcName] === 'function') {
+                    resultDiv.innerHTML += `<div class="test-result success">✅ ${funcName} 函数存在且可调用</div>`;
+                    
+                    // 对于某些函数，尝试实际调用（安全的测试调用）
+                    if (funcName === 'showToast') {
+                        window[funcName]('测试消息', 'info');
+                        resultDiv.innerHTML += `<div class="test-result success">✅ ${funcName} 调用成功</div>`;
+                    } else if (funcName === 'resetParams') {
+                        // 这个函数通常是安全的
+                        try {
+                            window[funcName]();
+                            resultDiv.innerHTML += `<div class="test-result success">✅ ${funcName} 调用成功</div>`;
+                        } catch (e) {
+                            resultDiv.innerHTML += `<div class="test-result error">⚠️ ${funcName} 调用出错: ${e.message}</div>`;
+                        }
+                    } else {
+                        resultDiv.innerHTML += `<div class="test-result success">ℹ️ ${funcName} 函数存在，未执行实际调用</div>`;
+                    }
+                } else if (typeof window[funcName] !== 'undefined') {
+                    resultDiv.innerHTML += `<div class="test-result error">❌ ${funcName} 存在但不是函数，类型: ${typeof window[funcName]}</div>`;
+                } else {
+                    resultDiv.innerHTML += `<div class="test-result error">❌ ${funcName} 函数不存在</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML += `<div class="test-result error">❌ 测试 ${funcName} 时出错: ${error.message}</div>`;
+            }
+        }
+
+        function testObject(objName) {
+            const resultDiv = getResultDiv(objName);
+            
+            try {
+                if (typeof window[objName] !== 'undefined') {
+                    const obj = window[objName];
+                    if (typeof obj === 'object' && obj !== null) {
+                        resultDiv.innerHTML += `<div class="test-result success">✅ ${objName} 对象存在</div>`;
+                        
+                        // 列出对象的主要方法
+                        const methods = Object.getOwnPropertyNames(obj).filter(prop => typeof obj[prop] === 'function');
+                        if (methods.length > 0) {
+                            resultDiv.innerHTML += `<div class="test-result success">📋 ${objName} 方法: ${methods.slice(0, 5).join(', ')}${methods.length > 5 ? '...' : ''}</div>`;
+                        }
+                    } else if (typeof obj === 'function') {
+                        resultDiv.innerHTML += `<div class="test-result success">✅ ${objName} 构造函数存在</div>`;
+                    } else {
+                        resultDiv.innerHTML += `<div class="test-result error">❌ ${objName} 存在但不是对象，类型: ${typeof obj}</div>`;
+                    }
+                } else {
+                    resultDiv.innerHTML += `<div class="test-result error">❌ ${objName} 对象不存在</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML += `<div class="test-result error">❌ 测试 ${objName} 时出错: ${error.message}</div>`;
+            }
+        }
+
+        function getResultDiv(name) {
+            // 根据函数名确定结果显示区域
+            if (['genOnce', 'generateD2FromGrid', 'generateArticle'].includes(name)) {
+                return document.getElementById('generation-results');
+            } else if (['openDragTransformModal', 'openPresetModal', 'openArticleModal'].includes(name)) {
+                return document.getElementById('modal-results');
+            } else if (['openGridTransformModal', 'resetGridTransform'].includes(name)) {
+                return document.getElementById('grid-results');
+            } else if (['resetParams', 'showToast'].includes(name)) {
+                return document.getElementById('state-results');
+            } else {
+                return document.getElementById('object-results');
+            }
+        }
+
+        // 页面加载完成后自动运行基础测试
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('开始自动测试关键函数...');
+            
+            // 测试最关键的函数
+            setTimeout(() => {
+                testFunction('genOnce');
+                testFunction('showToast');
+                testObject('toastManager');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

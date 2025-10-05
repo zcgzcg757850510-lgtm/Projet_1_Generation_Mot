@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>Test du chargement automatique des prévisualisations</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: #fff; }
+        .test-section { background: #2a2a2a; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #1e4d1e; color: #4ade80; }
+        .error { background: #4d1e1e; color: #f87171; }
+        .info { background: #1e2a4d; color: #60a5fa; }
+        .preview-container { display: flex; gap: 10px; margin: 15px 0; }
+        .preview-box { width: 120px; height: 120px; border: 1px solid #444; background: #333; display: flex; align-items: center; justify-content: center; }
+        .preview-box img { max-width: 100%; max-height: 100%; }
+        button { background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        input { background: #333; color: #fff; border: 1px solid #555; padding: 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test du chargement automatique des images SVG</h1>
+    
+    <div class="test-section">
+        <h3>Configuration de test</h3>
+        <label>Caractère à tester: <input type="text" id="testChar" value="靠" maxlength="1"></label>
+        <button onclick="testAutoLoading()">Tester le chargement automatique</button>
+        <button onclick="testManualRefresh()">Tester le rafraîchissement manuel</button>
+        <button onclick="clearResults()">Effacer les résultats</button>
+    </div>
+
+    <div class="test-section">
+        <h3>Résultats des tests</h3>
+        <div id="testResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Aperçu des images chargées</h3>
+        <div class="preview-container">
+            <div class="preview-box">
+                <img id="testImgA" alt="A" style="display: none;">
+                <span id="labelA">A (轮廓)</span>
+            </div>
+            <div class="preview-box">
+                <img id="testImgC" alt="C" style="display: none;">
+                <span id="labelC">B (原始中轴)</span>
+            </div>
+            <div class="preview-box">
+                <img id="testImgD1" alt="D1" style="display: none;">
+                <span id="labelD1">C (处理中轴)</span>
+            </div>
+            <div class="preview-box">
+                <img id="testImgD2" alt="D2" style="display: none;">
+                <span id="labelD2">D1 (网格变形)</span>
+            </div>
+            <div class="preview-box">
+                <img id="testImgB" alt="B" style="display: none;">
+                <span id="labelB">D2 (填充)</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('testResults');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        async function testAutoLoading() {
+            const char = document.getElementById('testChar').value.trim();
+            if (!char) {
+                addResult('❌ Veuillez entrer un caractère à tester', 'error');
+                return;
+            }
+
+            addResult(`🔄 Test du chargement automatique pour le caractère: ${char}`, 'info');
+
+            try {
+                // Vérifier l'état des fichiers
+                const response = await fetch(`/status?ch=${encodeURIComponent(char)}`);
+                if (!response.ok) {
+                    addResult('❌ Impossible d\'obtenir l\'état des fichiers', 'error');
+                    return;
+                }
+
+                const statusData = await response.json();
+                const files = statusData.files || {};
+                
+                addResult(`📁 Fichiers détectés: ${JSON.stringify(files, null, 2)}`, 'info');
+
+                let loadedCount = 0;
+                const imageTypes = ['A', 'B', 'C', 'D', 'D2'];
+
+                // Tester le chargement de chaque type d'image
+                for (const type of imageTypes) {
+                    if (files[type]) {
+                        const imgElement = document.getElementById(`testImg${type === 'D' ? 'D1' : type}`);
+                        const labelElement = document.getElementById(`label${type === 'D' ? 'D1' : type}`);
+                        
+                        if (imgElement) {
+                            const imageUrl = type === 'D2' ? `/D2_median_fill/${files[type]}` : 
+                                           type === 'A' ? `/A_outlines/${files[type]}` :
+                                           type === 'B' ? `/B_raw_centerline/${files[type]}` :
+                                           type === 'C' ? `/C_processed_centerline/${files[type]}` :
+                                           type === 'D1' ? `/D1_grid_transform/${files[type]}` :
+                                           `/C_processed_centerline/${files[type]}`;
+
+                            imgElement.onload = () => {
+                                addResult(`✅ ${type} image chargée avec succès`, 'success');
+                                imgElement.style.display = 'block';
+                                labelElement.style.display = 'none';
+                                loadedCount++;
+                            };
+
+                            imgElement.onerror = () => {
+                                addResult(`❌ Échec du chargement de l'image ${type}`, 'error');
+                            };
+
+                            imgElement.src = imageUrl + '?ts=' + Date.now();
+                        }
+                    } else {
+                        addResult(`ℹ️ Aucun fichier ${type} trouvé pour le caractère ${char}`, 'info');
+                    }
+                }
+
+                if (loadedCount === 0) {
+                    addResult(`ℹ️ Aucune image trouvée pour le caractère ${char}`, 'info');
+                } else {
+                    addResult(`✅ Test terminé, ${loadedCount} images trouvées`, 'success');
+                }
+
+            } catch (error) {
+                addResult(`❌ Erreur lors du test: ${error.message}`, 'error');
+            }
+        }
+
+        async function testManualRefresh() {
+            addResult('🔄 Test du rafraîchissement manuel...', 'info');
+            
+            // Simuler l'appel de la fonction refreshPreviews
+            try {
+                const char = document.getElementById('testChar').value.trim();
+                if (!char) {
+                    addResult('❌ Veuillez entrer un caractère à tester', 'error');
+                    return;
+                }
+
+                // Simuler l'appel à loadExistingSVGs
+                await testAutoLoading();
+                addResult('✅ Rafraîchissement manuel simulé avec succès', 'success');
+            } catch (error) {
+                addResult(`❌ Erreur lors du rafraîchissement: ${error.message}`, 'error');
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+            
+            // Masquer toutes les images de test
+            ['A', 'B', 'C', 'D1', 'D2'].forEach(type => {
+                const img = document.getElementById(`testImg${type}`);
+                const label = document.getElementById(`label${type}`);
+                if (img) {
+                    img.style.display = 'none';
+                    img.src = '';
+                }
+                if (label) {
+                    label.style.display = 'block';
+                }
+            });
+            
+            addResult('🧹 Résultats effacés', 'info');
+        }
+
+        // Initialisation
+        addResult('🚀 Page de test initialisée. Entrez un caractère et cliquez sur "Tester le chargement automatique"', 'info');
+    </script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端模块测试 - Generateur_Mot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .module-status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .loaded { background-color: #28a745; }
+        .failed { background-color: #dc3545; }
+        .pending { background-color: #ffc107; }
+    </style>
+</head>
+<body>
+    <h1>🔧 前端JavaScript模块测试</h1>
+    
+    <div class="test-container">
+        <h2>📦 模块加载状态</h2>
+        <div id="moduleStatus">正在检测模块...</div>
+    </div>
+    
+    <div class="test-container">
+        <h2>🧪 功能测试</h2>
+        <button onclick="testToastManager()">测试提示系统</button>
+        <button onclick="testStateManager()">测试状态管理</button>
+        <button onclick="testGridTransform()">测试网格变形</button>
+        <button onclick="testPreviewManager()">测试预览管理</button>
+        <button onclick="testParamsManager()">测试参数管理</button>
+        <div id="testResults"></div>
+    </div>
+    
+    <div class="test-container">
+        <h2>📊 系统信息</h2>
+        <div id="systemInfo">
+            <p><strong>浏览器:</strong> <span id="browserInfo"></span></p>
+            <p><strong>时间:</strong> <span id="currentTime"></span></p>
+            <p><strong>页面加载时间:</strong> <span id="loadTime"></span></p>
+        </div>
+    </div>
+
+    <!-- 加载所有模块 -->
+    <script src="js/utils.js"></script>
+    <script src="js/state-manager.js"></script>
+    <script src="js/preset-modal.js"></script>
+    <script src="js/modal-loader.js"></script>
+    <script src="js/modal-manager.js"></script>
+    <script src="js/mesh-deformation.js"></script>
+    <script src="js/grid-transform.js"></script>
+    <script src="js/generation-service.js"></script>
+    <script src="js/preview-manager.js"></script>
+    <script src="js/preview-effects.js"></script>
+    <script src="js/test-utils.js"></script>
+    <script src="js/params-manager.js"></script>
+    <script src="js/generation-manager.js"></script>
+
+    <script>
+        const startTime = performance.now();
+        
+        // 模块检测
+        const modules = [
+            { name: 'utils.js', check: () => typeof saveCurrentState === 'function' },
+            { name: 'state-manager.js', check: () => typeof StateManager !== 'undefined' },
+            { name: 'test-utils.js', check: () => typeof toastManager !== 'undefined' },
+            { name: 'grid-transform.js', check: () => typeof gridTransform !== 'undefined' },
+            { name: 'preview-manager.js', check: () => typeof previewManager !== 'undefined' },
+            { name: 'params-manager.js', check: () => typeof paramsManager !== 'undefined' },
+            { name: 'generation-manager.js', check: () => typeof generationManager !== 'undefined' }
+        ];
+        
+        function checkModules() {
+            const statusDiv = document.getElementById('moduleStatus');
+            let html = '';
+            let loadedCount = 0;
+            
+            modules.forEach(module => {
+                try {
+                    const isLoaded = module.check();
+                    const status = isLoaded ? 'loaded' : 'failed';
+                    const statusText = isLoaded ? '✅ 已加载' : '❌ 加载失败';
+                    if (isLoaded) loadedCount++;
+                    
+                    html += `<div><span class="module-status ${status}"></span><strong>${module.name}</strong>: ${statusText}</div>`;
+                } catch (e) {
+                    html += `<div><span class="module-status failed"></span><strong>${module.name}</strong>: ❌ 错误 - ${e.message}</div>`;
+                }
+            });
+            
+            html += `<div style="margin-top: 15px; font-weight: bold;">总计: ${loadedCount}/${modules.length} 个模块加载成功</div>`;
+            statusDiv.innerHTML = html;
+        }
+        
+        function addTestResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('testResults');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            resultsDiv.appendChild(div);
+        }
+        
+        function testToastManager() {
+            try {
+                if (typeof toastManager !== 'undefined') {
+                    toastManager.show('generation.success');
+                    addTestResult('✅ ToastManager测试成功 - 提示已显示', 'success');
+                } else {
+                    addTestResult('❌ ToastManager未加载', 'error');
+                }
+            } catch (e) {
+                addTestResult(`❌ ToastManager测试失败: ${e.message}`, 'error');
+            }
+        }
+        
+        function testStateManager() {
+            try {
+                if (typeof StateManager !== 'undefined') {
+                    StateManager.set('testKey', 'testValue');
+                    const value = StateManager.get('testKey');
+                    if (value === 'testValue') {
+                        addTestResult('✅ StateManager测试成功 - 状态保存和读取正常', 'success');
+                    } else {
+                        addTestResult('❌ StateManager测试失败 - 状态读取错误', 'error');
+                    }
+                } else {
+                    addTestResult('❌ StateManager未加载', 'error');
+                }
+            } catch (e) {
+                addTestResult(`❌ StateManager测试失败: ${e.message}`, 'error');
+            }
+        }
+        
+        function testGridTransform() {
+            try {
+                if (typeof gridTransform !== 'undefined') {
+                    const hasRequiredProps = gridTransform.hasOwnProperty('size') && 
+                                           gridTransform.hasOwnProperty('controlPoints') &&
+                                           gridTransform.hasOwnProperty('deformStrength');
+                    if (hasRequiredProps) {
+                        addTestResult('✅ GridTransform测试成功 - 对象结构正确', 'success');
+                    } else {
+                        addTestResult('❌ GridTransform测试失败 - 缺少必要属性', 'error');
+                    }
+                } else {
+                    addTestResult('❌ GridTransform未加载', 'error');
+                }
+            } catch (e) {
+                addTestResult(`❌ GridTransform测试失败: ${e.message}`, 'error');
+            }
+        }
+        
+        function testPreviewManager() {
+            try {
+                if (typeof previewManager !== 'undefined') {
+                    addTestResult('✅ PreviewManager测试成功 - 模块已加载', 'success');
+                } else {
+                    addTestResult('❌ PreviewManager未加载', 'error');
+                }
+            } catch (e) {
+                addTestResult(`❌ PreviewManager测试失败: ${e.message}`, 'error');
+            }
+        }
+        
+        function testParamsManager() {
+            try {
+                if (typeof paramsManager !== 'undefined') {
+                    addTestResult('✅ ParamsManager测试成功 - 模块已加载', 'success');
+                } else {
+                    addTestResult('❌ ParamsManager未加载', 'error');
+                }
+            } catch (e) {
+                addTestResult(`❌ ParamsManager测试失败: ${e.message}`, 'error');
+            }
+        }
+        
+        function updateSystemInfo() {
+            document.getElementById('browserInfo').textContent = navigator.userAgent.split(' ')[0];
+            document.getElementById('currentTime').textContent = new Date().toLocaleString('zh-CN');
+            document.getElementById('loadTime').textContent = `${(performance.now() - startTime).toFixed(2)}ms`;
+        }
+        
+        // 页面加载完成后执行检测
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                checkModules();
+                updateSystemInfo();
+                addTestResult('🚀 页面初始化完成，可以开始测试各个模块功能', 'info');
+            }, 100);
+        });
+    </script>
+</body>
+</html>

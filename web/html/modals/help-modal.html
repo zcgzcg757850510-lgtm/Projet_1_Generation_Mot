@@ -1,0 +1,124 @@
+<!-- Help Modal -->
+<div id="helpModal" class="modal hidden">
+  <div class="box">
+    <div class="toolbar" style="background: var(--glass); backdrop-filter: blur(12px) saturate(120%); -webkit-backdrop-filter: blur(12px) saturate(120%); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;">
+      <div class="left" style="color: var(--fg-0); font-weight: 600;">📖 使用说明</div>
+      <div class="right">
+        <button type="button" id="btnHelpClose" onclick="closeHelpModal()" style="background: var(--glass); border: 1px solid var(--border); color: var(--fg-0); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">✖ 关闭</button>
+      </div>
+    </div>
+    <div class="viewport" style="background: var(--bg-1); padding: 24px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; max-width: none; margin: 0;">
+        
+        <!-- Left Column: Basic Usage and Buttons -->
+        <div class="help-panel" style="background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 20px; backdrop-filter: blur(12px) saturate(120%); -webkit-backdrop-filter: blur(12px) saturate(120%);">
+          
+          <!-- 基本使用 -->
+          <div class="help-section" style="margin-bottom: 24px;">
+            <h3 style="color: var(--fg-0); font-size: 16px; margin-bottom: 12px; font-weight: 600;">🚀 基本使用</h3>
+            <div style="color: var(--muted); line-height: 1.6; font-size: 14px;">
+              <p style="margin: 8px 0;">1. 在字符框里输入一个汉字</p>
+              <p style="margin: 8px 0;">2. 点击 C 按钮生成字符</p>
+              <p style="margin: 8px 0;">3. 查看五个预览窗口的效果</p>
+            </div>
+          </div>
+
+          <!-- 按钮功能 -->
+          <div class="help-section" style="margin-bottom: 24px;">
+            <h3 style="color: var(--fg-0); font-size: 16px; margin-bottom: 12px; font-weight: 600;">🔘 按钮功能</h3>
+            <div style="color: var(--muted); line-height: 1.6; font-size: 14px;">
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">C</strong> - 生成基本字符</p>
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">D1</strong> - 生成变形字符</p>
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">D2</strong> - 生成高级字符</p>
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">网格变形</strong> - 打开变形工具</p>
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">重置</strong> - 清空所有设置</p>
+            </div>
+          </div>
+
+          <!-- 预览窗口 -->
+          <div class="help-section" style="margin-bottom: 24px;">
+            <h3 style="color: var(--fg-0); font-size: 16px; margin-bottom: 12px; font-weight: 600;">🖼️ 预览窗口</h3>
+            <div style="color: var(--muted); line-height: 1.6; font-size: 14px;">
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">A</strong> - 轮廓模式</p>
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">B</strong> - 原始中轴</p>
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">C</strong> - 处理中轴</p>
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">D1</strong> - 网格变形</p>
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">D2</strong> - 中轴填充</p>
+              <p style="margin: 8px 0; font-style: italic;">💡 点击 ⛶ 可以放大窗口</p>
+            </div>
+          </div>
+
+          <!-- 小贴士 -->
+          <div class="help-section">
+            <h3 style="color: var(--fg-0); font-size: 16px; margin-bottom: 12px; font-weight: 600;">💡 小贴士</h3>
+            <div style="color: var(--muted); line-height: 1.6; font-size: 14px;">
+              <p style="margin: 8px 0;">• 每次修改参数后要重新生成</p>
+              <p style="margin: 8px 0;">• 鼠标悬停可查看参数说明</p>
+              <p style="margin: 8px 0;">• 所有设置都会自动保存</p>
+              <p style="margin: 8px 0;">• 如果遇到问题，试试点击 "重置"</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right Column: Advanced Features -->
+        <div class="advanced-panel" style="background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 20px; backdrop-filter: blur(12px) saturate(120%); -webkit-backdrop-filter: blur(12px) saturate(120%);">
+          
+          <!-- 参数调整 -->
+          <div class="help-section" style="margin-bottom: 24px;">
+            <h3 style="color: var(--fg-0); font-size: 16px; margin-bottom: 12px; font-weight: 600;">⚙️ 参数调整</h3>
+            <div style="color: var(--muted); line-height: 1.6; font-size: 14px;">
+              <p style="margin: 8px 0;">使用顶部的标签页调整效果：</p>
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">起笔</strong> - 调整开始笔画</p>
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">笔锋</strong> - 调整结束笔画</p>
+              <p style="margin: 8px 0;"><strong style="color: var(--fg-0);">中间</strong> - 调整笔画形状</p>
+              <p style="margin: 8px 0; font-style: italic;">💡 勾选复选框来启用功能</p>
+            </div>
+          </div>
+
+          <!-- 网格变形 -->
+          <div class="help-section" style="margin-bottom: 24px;">
+            <h3 style="color: var(--fg-0); font-size: 16px; margin-bottom: 12px; font-weight: 600;">🎨 网格变形</h3>
+            <div style="color: var(--muted); line-height: 1.6; font-size: 14px;">
+              <p style="margin: 8px 0;">1. 点击 "网格变形" 按钮</p>
+              <p style="margin: 8px 0;">2. 拖动红色控制点</p>
+              <p style="margin: 8px 0;">3. 点击 "应用" 保存变形</p>
+              <p style="margin: 8px 0; font-style: italic;">💡 可以选择不同的网格大小</p>
+            </div>
+          </div>
+
+          <!-- 文章生成 -->
+          <div class="help-section" style="margin-bottom: 24px;">
+            <h3 style="color: var(--fg-0); font-size: 16px; margin-bottom: 12px; font-weight: 600;">📝 文章生成</h3>
+            <div style="color: var(--muted); line-height: 1.6; font-size: 14px;">
+              <p style="margin: 8px 0;">1. 点击 "文章生成" 按钮</p>
+              <p style="margin: 8px 0;">2. 输入要生成的文字</p>
+              <p style="margin: 8px 0;">3. 选择背景和间距</p>
+              <p style="margin: 8px 0;">4. 点击生成获得文章图片</p>
+            </div>
+          </div>
+
+          <!-- 预设管理 -->
+          <div class="help-section">
+            <h3 style="color: var(--fg-0); font-size: 16px; margin-bottom: 12px; font-weight: 600;">📋 预设管理</h3>
+            <div style="color: var(--muted); line-height: 1.6; font-size: 14px;">
+              <p style="margin: 8px 0;">1. 调整好参数后点击 "预设管理"</p>
+              <p style="margin: 8px 0;">2. 输入预设名称并保存</p>
+              <p style="margin: 8px 0;">3. 随时加载已保存的预设</p>
+              <p style="margin: 8px 0; font-style: italic;">💡 预设包含所有参数和网格变形</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Bottom Action -->
+      <div style="margin-top: 24px; text-align: center;">
+        <button type="button" onclick="closeHelpModal()" 
+                style="padding: 12px 24px; font-size: 14px; background: linear-gradient(135deg, #fff90a, #ffeb3b); 
+                       border: none; border-radius: 10px; color: #000; cursor: pointer; font-weight: 600;
+                       transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(255, 249, 10, 0.3);">
+          知道了
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

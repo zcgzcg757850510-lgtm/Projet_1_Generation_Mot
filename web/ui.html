@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>汉字生成器</title>
+<!-- CSS模块化引用 -->
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/forms.css">
+<link rel="stylesheet" href="css/tooltips.css">
+<link rel="stylesheet" href="css/toast.css">
+<link rel="stylesheet" href="css/modal.css">
+<link rel="stylesheet" href="css/preview-cards.css">
+<link rel="stylesheet" href="css/preview-effects.css">
+<link rel="stylesheet" href="css/dropdown.css">
+
+<!-- 内联CSS样式已抽离到独立模块文件 -->
+</head>
+<body>
+<div class="container">
+  <div class="tabs" style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; gap: 0; align-items: center;">
+      <button data-tab="tab-raw">原始中轴（B）</button>
+      <button data-tab="tab-start-peak">起笔+笔锋（C）</button>
+      <button data-tab="tab-middle">最终调整(C)</button>
+      <button type="button" onclick="openDragTransformModal()" 
+              class="btn-with-yellow-highlight"
+              style="margin-left: 16px; border: none; background: transparent; color: #ddd; padding: 8px 10px; border-bottom: 2px solid transparent; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s ease;">
+        🎨 网格变形
+      </button>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <button type="button" onclick="openHelpModal()"
+              class="btn-with-yellow-highlight"
+              style="border:none;background:transparent;color:#ddd;padding:8px 10px;border-bottom:2px solid transparent;cursor:pointer">
+        说明
+      </button>
+      <button type="button" onclick="openArticleModal()" 
+              class="btn-with-yellow-highlight"
+              style="border:none;background:transparent;color:#ddd;padding:8px 10px;border-bottom:2px solid transparent;cursor:pointer">
+        文章生成
+      </button>
+      <button type="button" class="btn-with-yellow-highlight" onclick="openPresetModal()"
+              style="border:none;background:transparent;color:#ddd;padding:8px 16px;border-bottom:2px solid transparent;cursor:pointer;">
+        📋 预设管理
+      </button>
+    </div>
+  </div>
+  <div class="layout">
+    <!-- Left: controls -->
+    <div class="card section">
+      <form method="post">
+        <label>字符：<input type="text" name="char" maxlength="1" required placeholder="一" value="{{last_char}}"/></label>
+        <div class="actions">
+          <button type="button" onclick="generateA()">A</button>
+          <button type="button" onclick="generateB()">B</button>
+          <button type="button" onclick="generateC()">C</button>
+          <button type="button" onclick="generateD1()">D1</button>
+          <button type="button" onclick="generateD2()">D2</button>
+          <button type="button" onclick="generateAll()">全部</button>
+          <button type="button" onclick="resetParams()">重置</button>
+        </div>
+        <div id="tab-start-peak" class="tab-panel hidden" style="margin-top:12px">
+          <!-- 处理中轴角点范围设置（夹角范围） -->
+          <div class="ctrl-row">
+            <label class="checkbox-btn"><input type="checkbox" name="corner_range_on" {{ 'checked' if corner_range_on else '' }}><span class="checkmark"></span></label>
+            <div class="name">夹角范围</div>
+            <div class="param" style="display:flex;gap:8px"><div class="tooltip"><input class="striped-readonly" type="number" step="1" min="1" max="179" name="corner_min" value="{{corner_min}}" readonly><span class="tooltiptext">最小夹角阈值<br>范围：1-179度<br>大于此角度的转角将被识别为角点</span></div><div class="tooltip"><input class="striped-readonly" type="number" step="1" min="1" max="179" name="corner_max" value="{{corner_max}}" readonly><span class="tooltiptext">最大夹角阈值<br>范围：1-179度<br>小于此角度的转角将被识别为角点</span></div></div>
+          </div>
+
+          <div style="height:1px;background:var(--border);opacity:.6;margin:10px 0;"></div>
+
+          <!-- 起笔设置 -->
+          <div class="ctrl-row">
+            <label class="checkbox-btn"><input type="checkbox" name="start_angle_on" {{ 'checked' if start_angle_on else '' }}><span class="checkmark"></span></label>
+            <div class="name">起笔角度</div>
+            <label class="param tooltip"><input type="number" step="1" min="0" max="180" name="start_angle" value="{{start_angle}}"><span class="tooltiptext">起笔角度（度）<br>范围：0-180°<br>直接输入实际角度数值，如 90</span></label>
+          </div>
+          <div class="ctrl-row">
+            <label class="checkbox-btn"><input type="checkbox" name="start_trim_on" {{ 'checked' if start_trim_on else '' }}><span class="checkmark"></span></label>
+            <div class="name">裁剪起点</div>
+            <label class="param tooltip"><input type="number" step="0.01" name="start_trim" value="{{start_trim}}"><span class="tooltiptext">裁剪起点长度比例<br>范围：0.00-1.00<br>0.02表示裁剪笔画起点2%的长度</span></label>
+          </div>
+
+          <div style="height:1px;background:var(--border);opacity:.6;margin:10px 0;"></div>
+
+          <!-- 笔锋设置 -->
+          <div class="ctrl-row">
+            <label class="checkbox-btn"><input type="checkbox" name="end_angle_on" {{ 'checked' if end_angle_on else '' }}><span class="checkmark"></span></label>
+            <div class="name">笔锋角度</div>
+            <label class="param tooltip"><input type="number" step="1" min="0" max="180" name="end_angle" value="{{end_angle}}"><span class="tooltiptext">笔锋角度（度）<br>范围：0-180°<br>直接输入实际角度数值，如 90</span></label>
+          </div>
+          <div class="ctrl-row">
+            <label class="checkbox-btn"><input type="checkbox" name="end_trim_on" {{ 'checked' if end_trim_on else '' }}><span class="checkmark"></span></label>
+            <div class="name">裁剪终点</div>
+            <label class="param tooltip"><input type="number" step="0.01" name="end_trim" value="{{end_trim}}"><span class="tooltiptext">裁剪终点长度比例<br>范围：0.00-1.00<br>0.10表示裁剪笔画终点10%的长度</span></label>
+          </div>
+        </div>
+        <div id="tab-raw" class="tab-panel hidden" style="margin-top:12px">
+          <div class="ctrl-row">
+            <label class="checkbox-btn"><input type="checkbox" name="raw_window_on" {{ 'checked' if raw_window_on else '' }}><span class="checkmark"></span></label>
+            <div class="name">三色分段</div>
+            <div class="param" style="display:flex;gap:8px"><div class="tooltip"><input type="number" step="0.01" min="0" max="0.9" name="raw_start_frac" value="{{raw_start_frac}}"><span class="tooltiptext">起始段长度比例<br>范围：0.00-0.90<br>控制三色分段中起始段（蓝色）的长度比例</span></div><div class="tooltip"><input type="number" step="0.01" min="0" max="0.9" name="raw_end_frac" value="{{raw_end_frac}}"><span class="tooltiptext">结束段长度比例<br>范围：0.00-0.90<br>控制三色分段中结束段（红色）的长度比例</span></div></div>
+          </div>
+          <div class="ctrl-row">
+            <label class="checkbox-btn"><input type="checkbox" name="isolate_on" {{ 'checked' if isolate_on else '' }}><span class="checkmark"></span></label>
+            <div class="name">短边全紫</div>
+            <label class="param tooltip"><input type="number" step="0.01" min="0" name="isolate_min_len" value="{{isolate_min_len}}"><span class="tooltiptext">短边最小长度阈值<br>范围：0.00+<br>小于此长度的笔画将全部显示为紫色</span></label>
+          </div>
+        </div>
+        <div id="tab-middle" class="tab-panel hidden" style="margin-top:12px">
+          <div class="ctrl-row">
+            <label class="checkbox-btn"><input type="checkbox" name="chaikin_on" {{ 'checked' if chaikin_on else '' }}><span class="checkmark"></span></label>
+            <div class="name">细化次数</div>
+            <label class="param tooltip"><input type="number" step="1" name="chaikin" value="{{chaikin}}"><span class="tooltiptext">Chaikin平滑迭代次数<br>范围：0-5<br>增加点密度并平滑曲线，次数越多越平滑</span></label>
+          </div>
+          <div class="ctrl-row">
+            <label class="checkbox-btn"><input type="checkbox" name="smooth_on" {{ 'checked' if smooth_on else '' }}><span class="checkmark"></span></label>
+            <div class="name">平滑窗口</div>
+            <label class="param tooltip"><input type="number" step="1" name="smooth" value="{{smooth}}"><span class="tooltiptext">移动平均平滑窗口大小<br>范围：1-15<br>对点序列应用移动平均滤波，窗口越大越平滑</span></label>
+          </div>
+          <div class="ctrl-row">
+            <label class="checkbox-btn"><input type="checkbox" name="tilt" {{ 'checked' if tilt else '' }}><span class="checkmark"></span></label>
+            <div class="name">笔画倾斜</div>
+            <div class="param" style="display:flex;gap:8px"><div class="tooltip"><input type="number" step="1" min="-180" max="180" name="tilt_range" value="{{tilt_range}}"><span class="tooltiptext">倾斜角度（度）<br>范围：-180 ~ 180°<br>正值顺时针，负值逆时针</span></div></div>
+          </div>
+          
+          <div class="ctrl-row">
+            <label class="checkbox-btn"><input type="checkbox" name="move_on" {{ 'checked' if move_on else '' }}><span class="checkmark"></span></label>
+            <div class="name">笔画移动</div>
+            <label class="param tooltip"><input type="number" step="0.1" name="move_offset" value="{{move_offset}}"><span class="tooltiptext">垂直移动偏移量<br>范围：-1 到 +1.0<br>正值向上移动，负值向下移动</span></label>
+          </div>
+        </div>
+        <div id="tab-preview" class="tab-panel hidden" style="margin-top:12px"></div>
+      </form>
+    </div>
+    <!-- Middle: images only -->
+    <div class="card section">
+      <div id="four" class="four preview-cards">
+        <div class="cards__inner">
+          <!-- 预览卡片将通过PreviewCardManager动态生成 -->
+        </div>
+        <div class="preview-overlay cards__inner"></div>
+      </div>
+      <iframe id="pv" src="/preview?ts={{ts}}&v={{version}}" style="display:none"></iframe>
+    </div>
+    <!-- Right: angles/debug info -->
+    <div class="card section" id="rightPanel">
+      <div class="t" style="font-size:13px;color:var(--muted);margin-bottom:6px">测试窗口</div>
+      <div id="anglesBox" style="font-size: 11px; color: var(--fg-1); line-height: 1.4; background: var(--bg-2); padding: 8px; border-radius: 6px; min-height: 100px; overflow-y: auto; max-height: 300px;">
+        （角度信息将显示在此）
+      </div>
+      <div style="margin-top: 8px; text-align: center;">
+        <button onclick="copyTestWindow()" style="background: var(--glass); border: 1px solid var(--border); color: var(--fg-0); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;">复制内容</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- HTML模块将通过JavaScript动态加载 -->
+
+
+<script>
+// All inline JavaScript has been moved to modular files
+</script>
+<script src="js/utils.js"></script>
+<script src="js/state-manager.js"></script>
+<script src="js/tab-manager.js"></script>
+<script src="js/preview-card.js"></script>
+<script src="js/preset-modal.js"></script>
+<script src="js/modal-loader.js"></script>
+<script src="js/modal-manager.js"></script>
+<script src="js/mesh-deformation.js"></script>
+<script src="js/grid-transform.js"></script>
+<script src="js/grid-state-manager.js"></script>
+<script src="js/drag-transform.js"></script>
+<script src="js/article-generator.js"></script>
+<script src="js/generation-service.js"></script>
+<script src="js/button-generation.js"></script>
+<script src="js/preview-manager.js"></script>
+<script src="js/preview-effects.js"></script>
+<script src="js/test-utils.js"></script>
+<script src="js/params-manager.js"></script>
+<script src="js/generation-manager.js"></script>
+<script src="js/scroll-prevention.js"></script>
+
+<script>
+// 初始化模态框管理器和标签页管理器
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded - 开始初始化');
+    
+    // 延迟自动加载现有SVG文件
+    setTimeout(() => {
+        if (window.previewManager) {
+            console.log('🔄 页面加载完成，尝试自动加载现有SVG文件');
+            window.previewManager.loadExistingSVGs();
+        }
+    }, 50); // 延迟50mms确保所有组件都已完全初始化
+    
+    // 初始化标签页管理器（优先级最高）
+    if (typeof TabManager !== 'undefined') {
+        if (!window.tabManager) {
+            window.tabManager = new TabManager();
+        }
+        // 立即初始化，无延迟
+        window.tabManager.initialize();
+        console.log('标签页管理器初始化完成');
+    }
+    
+    // 初始化字符保存功能
+    if (typeof utils !== 'undefined') {
+        // 恢复上次输入的字符
+        utils.restoreLastChar();
+        
+        // 绑定字符输入框的自动保存事件
+        const charInput = document.querySelector('input[name="char"]');
+        if (charInput) {
+            console.log('🔧 设置字符输入框事件监听器');
+            
+            const saveCharacter = () => {
+                console.log('📝 字符输入事件触发:', charInput.value);
+                utils.saveCurrentState();
+                
+                // 自动加载新字符的现有SVG文件
+                if (charInput.value.trim() && window.previewManager) {
+                    setTimeout(() => {
+                        window.previewManager.loadExistingSVGs();
+                    }, 500); // 短延迟确保状态保存完成
+                }
+            };
+            
+            // 绑定多个事件确保保存触发
+            charInput.addEventListener('input', saveCharacter);
+            charInput.addEventListener('blur', saveCharacter);
+            charInput.addEventListener('change', saveCharacter);
+            
+            console.log('✅ 字符自动保存功能已启用');
+        } else {
+            console.error('❌ 未找到字符输入框元素');
+        }
+        
+        // 绑定表单自动保存
+        utils.bindAutoSave();
+
+        // 若“夹角范围”输入为只读，强制显示并保存默认值 35/179
+        try {
+            const minEl = document.querySelector('input[name="corner_min"]');
+            const maxEl = document.querySelector('input[name="corner_max"]');
+            if (minEl && maxEl && minEl.hasAttribute('readonly') && maxEl.hasAttribute('readonly')) {
+                if (minEl.value !== '35') { minEl.value = '35'; setPref('corner_min', '35'); }
+                if (maxEl.value !== '179') { maxEl.value = '179'; setPref('corner_max', '179'); }
+            }
+        } catch (e) {
+            console.warn('角度范围默认值设置失败:', e);
+        }
+    } else {
+        console.error('❌ Utils工具类未加载');
+    }
+    
+    // 刷新预览函数已移除 - 按钮已删除
+    // 添加genOnce函数（如果不存在）
+    if (typeof window.genOnce === 'undefined') {
+        window.genOnce = async function() {
+            const charInput = document.querySelector('input[name="char"]');
+            const char = charInput?.value?.trim();
+            if (!char) {
+                console.error('❌ 请先输入一个字符');
+                if (typeof showToast !== 'undefined') {
+                    showToast('请先输入一个字符', 'error');
+                }
+                return;
+            }
+            
+            console.log('🔄 开始生成所有图像');
+            if (typeof showToast !== 'undefined') {
+                showToast('正在生成所有图像...', 'info');
+            }
+            
+            try {
+            // 调用后端API生成所有图像
+            const response = await fetch('/api/gen', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        char: char
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ 图像生成成功:', result);
+                    
+                    // 更新所有预览
+                    if (window.previewCardManager && result.urls) {
+                        const timestamp = Date.now();
+                        Object.entries(result.urls).forEach(([key, url]) => {
+                            if (url) {
+                                window.previewCardManager.setCardImage(key, url + '?ts=' + timestamp);
+                            }
+                        });
+                    }
+                    
+                    if (typeof showToast !== 'undefined') {
+                        showToast('所有图像生成完成', 'success');
+                    }
+                } else {
+                    throw new Error('生成失败');
+                }
+            } catch (error) {
+                console.error('❌ 图像生成失败:', error);
+                if (typeof showToast !== 'undefined') {
+                    showToast('图像生成失败', 'error');
+                }
+            }
+        };
+    }
+    
+    // 定义调试函数 - 测试文件检测
+    window.debugFileDetection = async function() {
+        const charInput = document.querySelector('input[name="char"]');
+        const char = charInput?.value?.trim();
+        if (!char) {
+            console.error('❌ 请先输入一个字符');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/status?ch=${encodeURIComponent(char)}`);
+            const data = await response.json();
+            console.log('🔍 文件检测结果:', data);
+            
+            if (window.previewManager) {
+                window.previewManager.updateTestWindow(`🔍 调试: 检测到 ${Object.keys(data.files || {}).length} 个文件类型`);
+            }
+        } catch (error) {
+            console.error('❌ 文件检测失败:', error);
+        }
+    };
+    
+    // 初始化模态框管理器
+    if (typeof initModalManager === 'function') {
+        console.log('initModalManager函数存在，开始调用');
+        initModalManager();
+        console.log('initModalManager调用完成');
+        
+        // 验证按钮是否存在和绑定
+        setTimeout(() => {
+            const btn = document.getElementById('btnArticleClose');
+            console.log('btnArticleClose按钮:', btn);
+            if (btn) {
+                console.log('按钮onclick事件:', btn.onclick);
+                // 手动添加备用事件监听器
+                btn.addEventListener('click', function() {
+                    console.log('备用关闭事件触发');
+                    if (window.closeArticleModal) {
+                        window.closeArticleModal();
+                    } else if (window.modalManager) {
+                        window.modalManager.closeModal('article');
+                    }
+                });
+            }
+        }, 100);
+    } else {
+        console.error('initModalManager函数不存在');
+    }
+});
+</script>
+
+</body>
+</html>

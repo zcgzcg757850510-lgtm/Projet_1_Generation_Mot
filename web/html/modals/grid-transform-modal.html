@@ -1,0 +1,109 @@
+<!-- Grid Transform Modal -->
+<div id="dragTransformModal" class="modal hidden">
+  <div class="box">
+    <div class="toolbar" style="background: var(--glass); backdrop-filter: blur(12px) saturate(120%); -webkit-backdrop-filter: blur(12px) saturate(120%); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;">
+      <div class="left" style="font-weight: 600; font-size: 16px; color: var(--fg-0);">
+        🎨 网格变形工具
+      </div>
+      <div class="right" style="display: flex; gap: 8px;">
+        <button type="button" id="btnDragTransformClose"
+                style="padding: 8px 16px; background: var(--glass); color: var(--fg-0); border: 1px solid var(--border); border-radius: 8px; font-size: 14px; cursor: pointer; transition: all 0.2s; font-weight: 500;">
+          ✖ 关闭
+        </button>
+      </div>
+    </div>
+    <div class="viewport" style="background: var(--bg-1); padding: 24px;">
+      <div style="display: grid; grid-template-columns: 300px 1fr; gap: 24px; width: 100%; max-width: none; margin: 0;">
+        
+        <!-- Left Control Panel -->
+        <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 20px; backdrop-filter: blur(12px) saturate(120%); -webkit-backdrop-filter: blur(12px) saturate(120%);">
+          <div style="margin-bottom: 12px;">
+            <div style="color: var(--fg-0); font-weight: 600; font-size: 16px;">网格变形控制</div>
+          </div>
+        
+        <!-- Grid Size Section -->
+        <div class="form-group" style="margin-bottom: 24px; padding: 16px; background: rgba(255,255,255,.03); border-radius: 12px; border: 1px solid var(--border);">
+          <label style="display: block; font-size: 14px; color: var(--fg-0); margin-bottom: 10px; font-weight: 500;">
+            ⚏ 网格密度
+          </label>
+          <select id="gridSize" onchange="updateGridSize()" 
+                  style="width: 100%; padding: 10px 12px; border-radius: 8px; background: rgba(255,255,255,.12); color: var(--fg-0); border: 1px solid var(--border); font-size: 13px; transition: all 0.2s; outline: none;">
+            <option value="2">2×2 网格 (4个控制点)</option>
+            <option value="3" selected>3×3 网格 (9个控制点)</option>
+          </select>
+        </div>
+        
+        <!-- Deform Strength Section -->
+        <div class="form-group" style="margin-bottom: 24px; padding: 16px; border-radius: 12px; border: 1px solid var(--border); background: repeating-linear-gradient(135deg, rgba(255,255,255,.06) 0px, rgba(255,255,255,.06) 8px, rgba(255,255,255,.02) 8px, rgba(255,255,255,.02) 16px);">
+          <label style="display: block; font-size: 14px; color: var(--fg-0); margin-bottom: 10px; font-weight: 500;">
+            💪 变形强度
+          </label>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <input type="range" id="deformStrength" min="1.0" max="1.0" step="0.0" value="1.0" onchange="updateDeformStrength()" disabled aria-disabled="true" tabindex="-1"
+                   style="flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); outline: none; -webkit-appearance: none; appearance: none; accent-color: #fff90a; cursor: not-allowed; opacity: .85;">
+            <span id="strengthValue" style="font-size: 12px; color: #fff90a; font-weight: 600; min-width: 32px; text-align: center; background: rgba(255, 249, 10, 0.1); padding: 4px 8px; border-radius: 6px; border: 1px solid #fff90a;">1.0</span>
+          </div>
+        </div>
+        
+          
+          <div class="action-buttons" style="display: flex; gap: 12px; justify-content: center; margin-bottom: 24px;">
+            <button onclick="resetGridTransform()" 
+                    style="padding: 12px 20px; font-size: 14px; background: var(--glass); 
+                           border: 1px solid var(--border); border-radius: 10px; color: var(--fg-0); cursor: pointer; 
+                           transition: all 0.2s ease;">
+              🔄 重置网格
+            </button>
+          </div>
+          
+          <!-- Help Section -->
+          <div style="padding: 16px; background: rgba(255, 249, 10, 0.05); border-radius: 12px; border: 1px solid rgba(255, 249, 10, 0.2);">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+              <span style="margin-right: 8px; font-size: 16px;">💡</span>
+              <strong style="color: var(--fg-0); font-size: 14px;">使用技巧</strong>
+            </div>
+            <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--muted); line-height: 1.6;">
+              <li>拖拽绿色控制点进行变形</li>
+              <li>双击控制点重置到原位置</li>
+              <li>支持实时预览变形结果</li>
+              <li>其他功能待开发</li>
+            </ul>
+          </div>
+          
+          <!-- Status Display -->
+          <div id="gridStatus" style="margin-top: 16px; padding: 12px 16px; background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 10px; font-size: 13px; color: #4CAF50; text-align: center; font-weight: 500;">
+            ✓ 准备就绪
+          </div>
+        </div>
+        
+        <!-- Main Canvas Area -->
+        <div style="position: relative; background: var(--glass); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; backdrop-filter: blur(12px) saturate(120%); -webkit-backdrop-filter: blur(12px) saturate(120%);">
+          
+          <!-- Canvas Header -->
+          <div style="position: absolute; top: 0; left: 0; right: 0; height: 50px; background: rgba(255,255,255,.05); border-bottom: 1px solid var(--border); z-index: 5; display: flex; align-items: center; padding: 0 20px;">
+            <div style="color: var(--fg-0); font-weight: 600; font-size: 14px;">
+              🎯 变形画布
+            </div>
+            <div style="margin-left: auto; color: var(--muted); font-size: 12px;" id="gridInfo">
+               | 拖拽控制点变形
+            </div>
+          </div>
+          
+          <!-- SVG Container -->
+          <div id="gridSvgContainer" style="position: absolute; top: 50px; left: 0; right: 0; bottom: 0; z-index: 1; pointer-events: none;">
+          </div>
+          
+          <!-- Grid Overlay (points on top) -->
+          <canvas id="gridCanvas" style="position: absolute; top: 50px; left: 0; right: 0; bottom: 0; z-index: 5; cursor: crosshair;"></canvas>
+          
+          <!-- Control Points Container -->
+          <div id="gridControlPoints" style="position: absolute; top: 50px; left: 0; right: 0; bottom: 0; z-index: 3; pointer-events: none;">
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Warp.js库用于SVG变形 -->
+<script src="https://unpkg.com/warpjs@1.0.4/dist/warp.min.js"></script>
